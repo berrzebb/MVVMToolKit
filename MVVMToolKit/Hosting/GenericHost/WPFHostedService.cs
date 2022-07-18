@@ -39,6 +39,7 @@ namespace MVVMToolKit.Hosting.GenericHost
             _logger?.LogInformation($"Starting WPF application {nameof(WPFHostedService<TApplication>)}.");
             // Make the UI thread go
             _wpfThread?.Start();
+
             _logger?.LogInformation("WPF thread started.");
 
             return Task.CompletedTask;
@@ -62,7 +63,7 @@ namespace MVVMToolKit.Hosting.GenericHost
                         {
                             await _wpfThread.JoinableTaskFactory.SwitchToMainThreadAsync();
                             _wpfContext.IsRunning = false;
-                            _wpfContext.WPFApplication.Shutdown(0);
+                            //_wpfContext.WPFApplication.Shutdown(0);
                         }
                     }
                 }

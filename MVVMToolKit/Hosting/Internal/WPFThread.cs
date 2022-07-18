@@ -132,7 +132,6 @@ namespace MVVMToolKit.Hosting.Internal
                 wpfComponent.InitializeComponent();
                 disposableList.Add(wpfComponent);
             }
-
             //WPF 응용프로그램을 시작합니다. 해당 작업은 Blocking 작업입니다.
             _wpfContext.WPFApplication?.Run();
         }

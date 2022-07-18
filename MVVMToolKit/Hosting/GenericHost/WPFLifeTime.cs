@@ -93,7 +93,7 @@ namespace MVVMToolKit.Hosting.GenericHost
             }
             WPFContext.ExitHandler = OnWpfExiting;
         }
-        private void OnApplicationStopping()
+        private async void OnApplicationStopping()
         {
             if (!Options.SuppressStatusMessages)
             {
@@ -106,7 +106,7 @@ namespace MVVMToolKit.Hosting.GenericHost
                 var joinableTaskFactory = ServiceProvider.GetService<JoinableTaskFactory>();
                 if (joinableTaskFactory != null)
                 {
-                    joinableTaskFactory.SwitchToMainThreadAsync();
+                    await joinableTaskFactory.SwitchToMainThreadAsync();
                     WPFContext.WPFApplication.Exit -= OnWpfExiting;
                 }
             }
@@ -126,7 +126,7 @@ namespace MVVMToolKit.Hosting.GenericHost
                 Logger.LogInformation("Waiting for the host to be disposed, please ensure all 'IHost' instances are wrapped in 'using' blocks");
             }
 
-            _shutdownBlock.WaitOne();
+            //_shutdownBlock.WaitOne();
 
             // On Linux if the shutdown is triggered by SIGTERM then that's signaled with the 143 exit code.
             // Suppress that since we shut down gracefully. https://github.com/aspnet/AspNetCore/issues/6526
@@ -135,6 +135,7 @@ namespace MVVMToolKit.Hosting.GenericHost
         private void OnWpfExiting(object? sender, ExitEventArgs e)
         {
             ApplicationLifetime.StopApplication();
+            Logger.LogInformation("Wpf application is exit");
         }
         public void Dispose()
         {
