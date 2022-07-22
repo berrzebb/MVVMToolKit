@@ -2,13 +2,12 @@
              xmlns:prism="clr-namespace:MVVMToolKit.Hosting;assembly=MVVMToolKit" x:Class="MVVMToolKitSample.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:MVVMToolKitSample" xmlns:locator="clr-namespace:MVVMToolKitSample.Locator"
+             xmlns:local="clr-namespace:MVVMToolKitSample"
              ShutdownMode="OnLastWindowClose">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
             </ResourceDictionary.MergedDictionaries>
-            <locator:ViewModelLocatorHost x:Key="Locator"/>
         </ResourceDictionary>
     </Application.Resources>
 </prism:GenericHostPrismApplication>

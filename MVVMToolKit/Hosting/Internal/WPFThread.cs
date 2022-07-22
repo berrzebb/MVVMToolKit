@@ -111,8 +111,10 @@ namespace MVVMToolKit.Hosting.Internal
             _wpfContext.SetWPFApplication(application);
             //기본 응용프로그램의 객체들을 초기화 합니다.
             application.InitializeComponent();
-            _preContextInitialization?.Invoke(_wpfContext);
-
+            if (_wpfContext.WPFApplication is IApplicationInitialize initializeApplication)
+            {
+                initializeApplication.Initialize();
+            }
         }
 
         /// <summary>
@@ -123,15 +125,6 @@ namespace MVVMToolKit.Hosting.Internal
             // 응용프로그램이 시작되었다고 체크합니다.
             _wpfContext.IsRunning = true;
 
-            // WPF Component 인터페이스가 정의된 객체들을 Dispose목록에 등록합니다.
-            var wpfComponentsFunc = _serviceProvider.GetServices<Func<IWPFComponent>>();
-            using var disposableList = new DisposableList<IWPFComponent>();
-            foreach (var wpfComponentFunc in wpfComponentsFunc)
-            {
-                var wpfComponent = wpfComponentFunc.Invoke();
-                wpfComponent.InitializeComponent();
-                disposableList.Add(wpfComponent);
-            }
             //WPF 응용프로그램을 시작합니다. 해당 작업은 Blocking 작업입니다.
             _wpfContext.WPFApplication?.Run();
         }

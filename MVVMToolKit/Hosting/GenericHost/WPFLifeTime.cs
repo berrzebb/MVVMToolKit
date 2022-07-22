@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.Threading;
 using MVVMToolKit.Hosting.Core;
+using MVVMToolKit.Hosting.Internal;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -29,6 +30,7 @@ namespace MVVMToolKit.Hosting.GenericHost
         private HostOptions HostOptions { get; }
 
         private ILogger Logger { get; }
+        internal readonly DisposableList<IDisposable> _disposable;
 
         public WPFLifeTime(
             IWPFContext wpfContext,
@@ -55,7 +57,10 @@ namespace MVVMToolKit.Hosting.GenericHost
             ApplicationLifetime = applicationLifetime ?? throw new ArgumentNullException(nameof(applicationLifetime));
             HostOptions = hostOptions.Value ?? throw new ArgumentNullException(nameof(hostOptions));
             Logger = loggerFactory.CreateLogger("Microsoft.Hosting.Lifetime");
+            _disposable = serviceProvider.GetRequiredService<DisposableList<IDisposable>>();
         }
+        internal void AddDisposable(IDisposable disposable) => _disposable.Add(disposable);
+
         public Task WaitForStartAsync(CancellationToken cancellationToken)
         {
             //Indicate that we are using our custom lifetime
@@ -93,7 +98,7 @@ namespace MVVMToolKit.Hosting.GenericHost
             }
             WPFContext.ExitHandler = OnWpfExiting;
         }
-        private async void OnApplicationStopping()
+        private void OnApplicationStopping()
         {
             if (!Options.SuppressStatusMessages)
             {
@@ -106,7 +111,7 @@ namespace MVVMToolKit.Hosting.GenericHost
                 var joinableTaskFactory = ServiceProvider.GetService<JoinableTaskFactory>();
                 if (joinableTaskFactory != null)
                 {
-                    await joinableTaskFactory.SwitchToMainThreadAsync();
+                    //await joinableTaskFactory.SwitchToMainThreadAsync();
                     WPFContext.WPFApplication.Exit -= OnWpfExiting;
                 }
             }
@@ -136,6 +141,7 @@ namespace MVVMToolKit.Hosting.GenericHost
         {
             ApplicationLifetime.StopApplication();
             Logger.LogInformation("Wpf application is exit");
+            _disposable.Dispose();
         }
         public void Dispose()
         {

@@ -20,10 +20,7 @@ namespace MVVMToolKit.Hosting.Extensions
         public static IServiceCollection AddWPF<TApplication>(this IServiceCollection services)
             where TApplication : Application, IApplicationInitializeComponent
         {
-            return AddWPF(services, (provider) =>
-            {
-                return ActivatorUtilities.CreateInstance<TApplication>(provider);
-            });
+            return AddWPF(services, (provider) => ActivatorUtilities.CreateInstance<TApplication>(provider));
         }
 
         /// <summary>
@@ -48,10 +45,51 @@ namespace MVVMToolKit.Hosting.Extensions
 
             return services.AddWPFCommonRegistrations<TApplication>();
         }
-
+        public static IServiceCollection AddView<TView>(this IServiceCollection services)
+            where TView : class, IWPFComponent
+        {
+            return services.AddView(provider => ActivatorUtilities.CreateInstance<TView>(provider));
+        }
+        public static IServiceCollection AddViewModel<TViewModel>(this IServiceCollection services)
+            where TViewModel : class, IWPFViewModel
+        {
+            return services.AddViewModel(provider => ActivatorUtilities.CreateInstance<TViewModel>(provider));
+        }
+        public static IServiceCollection AddView<TView>(this IServiceCollection services, Func<IServiceProvider, TView> createView)
+            where TView : class, IWPFComponent
+        {
+            services.AddTransient(provider =>
+            {
+                var view = createView(provider);
+                if (view is IDisposable)
+                {
+                    var disposables = provider.GetRequiredService<DisposableList<IDisposable>>();
+                    disposables.Add(view as IDisposable);
+                }
+                return view;
+            });
+            return services;
+        }
+        public static IServiceCollection AddViewModel<TViewModel>(this IServiceCollection services, Func<IServiceProvider, TViewModel> createViewModel)
+            where TViewModel : class, IWPFViewModel
+        {
+            services.AddTransient(provider =>
+            {
+                var view = createViewModel(provider);
+                if (view is IDisposable)
+                {
+                    var disposables = provider.GetRequiredService<DisposableList<IDisposable>>();
+                    disposables.Add(view as IDisposable);
+                }
+                return view;
+            });
+            return services;
+        }
         private static IServiceCollection AddWPFCommonRegistrations<TApplication>(this IServiceCollection services)
             where TApplication : Application, IApplicationInitializeComponent
         {
+            services.TryAddSingleton(new DisposableList<IDisposable>());
+
             //Register WpfContext
             var wpfContext = new WPFContext<TApplication>();
             services.TryAddSingleton(wpfContext); //for internal usage only
@@ -59,13 +97,12 @@ namespace MVVMToolKit.Hosting.Extensions
             services.TryAddSingleton<IWPFContext>(wpfContext);
 
             //Register WpfThread
-            services.TryAddSingleton<WPFThread<TApplication>>();  //for internal usage only
+            services.TryAddSingleton(provider => ActivatorUtilities.CreateInstance<WPFThread<TApplication>>(provider));  //for internal usage only
             services.TryAddSingleton<IWPFThread<TApplication>>(s => s.GetRequiredService<WPFThread<TApplication>>());
             services.TryAddSingleton<IWPFThread>(s => s.GetRequiredService<WPFThread<TApplication>>());
 
             //Register Wpf IHostedService
             services.AddHostedService<WPFHostedService<TApplication>>();
-
             return services;
         }
         /// <summary>
@@ -86,7 +123,12 @@ namespace MVVMToolKit.Hosting.Extensions
             services.AddSingleton<Func<IWPFComponent>>(provider =>
             {
                 //Gladly this exist to not make a lot of overloads / expose IServiceProvider :)
-                return () => ActivatorUtilities.CreateInstance<TTrayIcon>(provider);
+                return () =>
+                {
+                    var component = ActivatorUtilities.CreateInstance<TTrayIcon>(provider);
+                    component.InitializeComponent();
+                    return component;
+                };
             });
 
             return services;

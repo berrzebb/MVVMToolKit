@@ -13,4 +13,12 @@
     <ProjectReference Include="..\..\MVVMToolKit\MVVMToolKit.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="C:\Users\berrzebb\.nuget\packages\prism.microsoft.dependencyinjection.extensions\8.0.62\buildTransitive\PreserveContainerExtension.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="C:\Users\berrzebb\.nuget\packages\prism.microsoft.dependencyinjection.extensions\8.0.62\buildTransitive\PreserveContainerExtension.cs" />
+  </ItemGroup>
+
 </Project>

@@ -8,8 +8,8 @@ using System.Windows;
 
 namespace MVVMToolKit.Hosting.GenericHost
 {
-    public class WPFHostedService<TApplication>
-        : IHostedService where TApplication : Application, IApplicationInitializeComponent
+    public class WPFHostedService<TApplication> : IHostedService
+        where TApplication : Application, IApplicationInitializeComponent
     {
         private readonly ILogger<WPFHostedService<TApplication>> _logger;
         private readonly IWPFThread<TApplication> _wpfThread;
@@ -29,11 +29,11 @@ namespace MVVMToolKit.Hosting.GenericHost
         }
 
         /// <inheritdoc />
-        public Task StartAsync(CancellationToken cancellationToken)
+        public async Task StartAsync(CancellationToken cancellationToken)
         {
             if (cancellationToken.IsCancellationRequested)
             {
-                return Task.CompletedTask;
+                await Task.CompletedTask;
             }
 
             _logger?.LogInformation($"Starting WPF application {nameof(WPFHostedService<TApplication>)}.");
@@ -42,7 +42,7 @@ namespace MVVMToolKit.Hosting.GenericHost
 
             _logger?.LogInformation("WPF thread started.");
 
-            return Task.CompletedTask;
+            await Task.CompletedTask;
         }
 
         /// <inheritdoc />

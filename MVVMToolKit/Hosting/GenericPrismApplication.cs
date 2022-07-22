@@ -1,32 +1,41 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using MVVMToolKit.Hosting.Core;
 using MVVMToolKit.Hosting.Extensions;
 using Prism.Ioc;
+using System;
 using System.Windows;
 using System.Windows.Threading;
 
 namespace MVVMToolKit.Hosting
 {
-    public abstract class GenericHostPrismApplication : Application
+    public abstract class GenericHostPrismApplication : Application, IApplicationInitialize, IApplicationInitializeComponent
     {
         protected Bootstrapper? _bootstrapper = null;
-        protected readonly IServiceCollection _serviceCollection;
+        protected readonly IServiceProvider _provider;
+        private IServiceCollection _serviceCollection;
         protected readonly ILogger<GenericHostPrismApplication> _logger;
-        public GenericHostPrismApplication(ILogger<GenericHostPrismApplication> logger, IServiceCollection serviceCollection)
+        public GenericHostPrismApplication(IServiceProvider provider)
         {
             this.CheckForInvalidConstructorConfiguration();
-            _logger = logger;
-            _serviceCollection = serviceCollection;
+            _provider = provider;
+            _logger = _provider.GetRequiredService<ILogger<GenericHostPrismApplication>>();
+            _serviceCollection = _provider.GetRequiredService<IServiceCollection>();
             Dispatcher.UnhandledException += Dispatcher_UnhandledException;
             Dispatcher.UnhandledExceptionFilter += Dispatcher_UnhandledExceptionFilter;
         }
         public void InitializeBootstrapper<TMainWindow>() where TMainWindow : Window
         {
+            _logger.LogInformation($"Starting Prism Bootstrapper");
             _bootstrapper = new Bootstrapper<TMainWindow>(_serviceCollection);
             _bootstrapper._RegisterTypes = RegisterTypes;
             _bootstrapper.Run();
+            _logger.LogInformation($"Prism Bootstrapper started.");
         }
-        protected abstract void RegisterTypes(IContainerRegistry containerRegistry);
+        protected virtual void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+
+        }
         private void Dispatcher_UnhandledExceptionFilter(object sender, DispatcherUnhandledExceptionFilterEventArgs e)
         {
             try
@@ -51,5 +60,9 @@ namespace MVVMToolKit.Hosting
             catch { }
 
         }
+
+        public abstract void Initialize();
+
+        void IApplicationInitializeComponent.InitializeComponent() { }
     }
 }
