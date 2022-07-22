@@ -11,7 +11,7 @@ using System.Windows.Threading;
 namespace MVVMToolKit.Hosting.Internal
 {
     internal class WPFThread<TApplication>
-        : IWPFThread<TApplication> where TApplication : Application, IApplicationInitializeComponent
+        : IWPFThread<TApplication> where TApplication : Application
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly WPFContext<TApplication> _wpfContext;
@@ -110,7 +110,6 @@ namespace MVVMToolKit.Hosting.Internal
             // Context에서 현재 응용프로그램을 접근 할 수 있도록 설정합니다.
             _wpfContext.SetWPFApplication(application);
             //기본 응용프로그램의 객체들을 초기화 합니다.
-            application.InitializeComponent();
             if (_wpfContext.WPFApplication is IApplicationInitialize initializeApplication)
             {
                 initializeApplication.Initialize();

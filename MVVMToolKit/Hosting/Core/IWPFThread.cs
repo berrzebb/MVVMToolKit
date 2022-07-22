@@ -24,7 +24,7 @@ namespace MVVMToolKit.Hosting.Core
         void HandleApplicationExit();
     }
 
-    public interface IWPFThread<out TApplication> : IWPFThread where TApplication : Application, IApplicationInitializeComponent
+    public interface IWPFThread<out TApplication> : IWPFThread where TApplication : Application
     {
         new IWPFContext<TApplication> WPFContext { get; }
     }

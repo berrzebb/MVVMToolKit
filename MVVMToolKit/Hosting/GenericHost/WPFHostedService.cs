@@ -9,7 +9,7 @@ using System.Windows;
 namespace MVVMToolKit.Hosting.GenericHost
 {
     public class WPFHostedService<TApplication> : IHostedService
-        where TApplication : Application, IApplicationInitializeComponent
+        where TApplication : Application
     {
         private readonly ILogger<WPFHostedService<TApplication>> _logger;
         private readonly IWPFThread<TApplication> _wpfThread;

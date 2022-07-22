@@ -21,4 +21,11 @@
     <Compile Remove="C:\Users\berrzebb\.nuget\packages\prism.microsoft.dependencyinjection.extensions\8.0.62\buildTransitive\PreserveContainerExtension.cs" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Costura.Fody" Version="5.7.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
 </Project>

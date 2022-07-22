@@ -9,7 +9,7 @@ using System.Windows.Threading;
 
 namespace MVVMToolKit.Hosting
 {
-    public abstract class GenericHostPrismApplication : Application, IApplicationInitialize, IApplicationInitializeComponent
+    public abstract class GenericHostPrismApplication : Application, IApplicationInitialize
     {
         protected Bootstrapper? _bootstrapper = null;
         protected readonly IServiceProvider _provider;
@@ -21,6 +21,8 @@ namespace MVVMToolKit.Hosting
             _provider = provider;
             _logger = _provider.GetRequiredService<ILogger<GenericHostPrismApplication>>();
             _serviceCollection = _provider.GetRequiredService<IServiceCollection>();
+            InitializeViewModels(_serviceCollection);
+            InitializeViews(_serviceCollection);
             Dispatcher.UnhandledException += Dispatcher_UnhandledException;
             Dispatcher.UnhandledExceptionFilter += Dispatcher_UnhandledExceptionFilter;
         }
@@ -32,9 +34,16 @@ namespace MVVMToolKit.Hosting
             _bootstrapper.Run();
             _logger.LogInformation($"Prism Bootstrapper started.");
         }
-        protected virtual void RegisterTypes(IContainerRegistry containerRegistry)
+        protected virtual void InitializeViews(IServiceCollection services)
         {
 
+        }
+        protected virtual void InitializeViewModels(IServiceCollection services)
+        {
+        }
+        protected virtual void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+            // Not Used?
         }
         private void Dispatcher_UnhandledExceptionFilter(object sender, DispatcherUnhandledExceptionFilterEventArgs e)
         {
@@ -62,7 +71,5 @@ namespace MVVMToolKit.Hosting
         }
 
         public abstract void Initialize();
-
-        void IApplicationInitializeComponent.InitializeComponent() { }
     }
 }

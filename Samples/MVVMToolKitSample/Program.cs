@@ -1,5 +1,4 @@
 ﻿using MVVMToolKit.Hosting;
-using MVVMToolKitSample.ViewModels;
 using System.Threading.Tasks;
 
 namespace MVVMToolKitSample
@@ -9,7 +8,7 @@ namespace MVVMToolKitSample
         public async static Task Main(string[] args)
         {
             Startup startup = new Startup();
-            await startup.RunAsync<MainWindowViewModel, App>(args);
+            await startup.RunAsync<App>(args);
         }
     }
 }

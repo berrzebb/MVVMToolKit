@@ -6,6 +6,8 @@ using MVVMToolKit.Hosting.GenericHost;
 using MVVMToolKit.Hosting.Internal;
 using System;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Markup;
 
 namespace MVVMToolKit.Hosting.Extensions
 {
@@ -18,7 +20,7 @@ namespace MVVMToolKit.Hosting.Extensions
         /// <typeparam name="TApplication">WPF <see cref="Application" />.</typeparam>
         /// <returns>The same instance of the <see cref="IServiceCollection"/> for chaining.</returns>
         public static IServiceCollection AddWPF<TApplication>(this IServiceCollection services)
-            where TApplication : Application, IApplicationInitializeComponent
+            where TApplication : Application
         {
             return AddWPF(services, (provider) => ActivatorUtilities.CreateInstance<TApplication>(provider));
         }
@@ -31,7 +33,7 @@ namespace MVVMToolKit.Hosting.Extensions
         /// <typeparam name="TApplication">WPF <see cref="Application" />.</typeparam>
         /// <returns>The same instance of the <see cref="IServiceCollection"/> for chaining.</returns>
         public static IServiceCollection AddWPF<TApplication>(this IServiceCollection services, Func<IServiceProvider, TApplication> createApplication)
-            where TApplication : Application, IApplicationInitializeComponent
+            where TApplication : Application
         {
 
             // internal usage only
@@ -46,7 +48,7 @@ namespace MVVMToolKit.Hosting.Extensions
             return services.AddWPFCommonRegistrations<TApplication>();
         }
         public static IServiceCollection AddView<TView>(this IServiceCollection services)
-            where TView : class, IWPFComponent
+            where TView : ContentControl
         {
             return services.AddView(provider => ActivatorUtilities.CreateInstance<TView>(provider));
         }
@@ -56,37 +58,34 @@ namespace MVVMToolKit.Hosting.Extensions
             return services.AddViewModel(provider => ActivatorUtilities.CreateInstance<TViewModel>(provider));
         }
         public static IServiceCollection AddView<TView>(this IServiceCollection services, Func<IServiceProvider, TView> createView)
-            where TView : class, IWPFComponent
+            where TView : ContentControl
         {
             services.AddTransient(provider =>
             {
                 var view = createView(provider);
-                if (view is IDisposable)
+                if (view is IDisposable disposable)
                 {
                     var disposables = provider.GetRequiredService<DisposableList<IDisposable>>();
-                    disposables.Add(view as IDisposable);
+                    disposables.Add(disposable);
                 }
                 return view;
             });
             return services;
         }
         public static IServiceCollection AddViewModel<TViewModel>(this IServiceCollection services, Func<IServiceProvider, TViewModel> createViewModel)
-            where TViewModel : class, IWPFViewModel
+            where TViewModel : class, IWPFViewModel, IDisposable
         {
             services.AddTransient(provider =>
             {
-                var view = createViewModel(provider);
-                if (view is IDisposable)
-                {
-                    var disposables = provider.GetRequiredService<DisposableList<IDisposable>>();
-                    disposables.Add(view as IDisposable);
-                }
-                return view;
+                var viewModel = createViewModel(provider);
+                var disposables = provider.GetRequiredService<DisposableList<IDisposable>>();
+                disposables.Add(viewModel);
+                return viewModel;
             });
             return services;
         }
         private static IServiceCollection AddWPFCommonRegistrations<TApplication>(this IServiceCollection services)
-            where TApplication : Application, IApplicationInitializeComponent
+            where TApplication : Application
         {
             services.TryAddSingleton(new DisposableList<IDisposable>());
 
@@ -162,7 +161,7 @@ namespace MVVMToolKit.Hosting.Extensions
         /// <see cref="AddThreadSwitching(IServiceCollection)"/>
         /// <note>Should we mark this method as obsolete or keep it? There is no real scenario where we need <see cref="TApplication"/>.</note>
         public static IServiceCollection AddThreadSwitching<TApplication>(this IServiceCollection services)
-            where TApplication : Application, IApplicationInitializeComponent, new()
+            where TApplication : Application, IComponentConnector, new()
         {
             services.AddSingleton(provider =>
             {
