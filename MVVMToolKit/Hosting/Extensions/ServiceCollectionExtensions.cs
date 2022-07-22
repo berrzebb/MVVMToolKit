@@ -20,9 +20,11 @@ namespace MVVMToolKit.Hosting.Extensions
         public static IServiceCollection AddWPF<TApplication>(this IServiceCollection services)
             where TApplication : Application, IApplicationInitializeComponent
         {
-            return AddWPF(services, (provider) => ActivatorUtilities.CreateInstance<TApplication>(provider));
+            return AddWPF(services, (provider) =>
+            {
+                return ActivatorUtilities.CreateInstance<TApplication>(provider);
+            });
         }
-
 
         /// <summary>
         /// Generic Host에 WPF를 추가하기 위한 구현체입니다. <see cref="Application" />.
@@ -34,6 +36,9 @@ namespace MVVMToolKit.Hosting.Extensions
         public static IServiceCollection AddWPF<TApplication>(this IServiceCollection services, Func<IServiceProvider, TApplication> createApplication)
             where TApplication : Application, IApplicationInitializeComponent
         {
+
+            // internal usage only
+            services.TryAddSingleton(services);
             //Only single TApplication should exist.
             services.TryAddSingleton<Func<TApplication>>(provider =>
             {
@@ -41,7 +46,7 @@ namespace MVVMToolKit.Hosting.Extensions
                 return () => createApplication(provider);
             });
 
-            return services.AddWPFCommonRegistrations<TApplication>(); ;
+            return services.AddWPFCommonRegistrations<TApplication>();
         }
 
         private static IServiceCollection AddWPFCommonRegistrations<TApplication>(this IServiceCollection services)
