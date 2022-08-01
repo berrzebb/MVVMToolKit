@@ -1,12 +1,12 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System;
+using System.Threading;
+using System.Windows;
+using System.Windows.Threading;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.VisualStudio.Threading;
 using MVVMToolKit.Hosting.Core;
 using MVVMToolKit.Hosting.Extensions;
-using System;
-using System.Threading;
-using System.Windows;
-using System.Windows.Threading;
 
 namespace MVVMToolKit.Hosting.Internal
 {
@@ -15,18 +15,19 @@ namespace MVVMToolKit.Hosting.Internal
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly WPFContext<TApplication> _wpfContext;
-        private Action<WPFContext<TApplication>>? _preContextInitialization;
-        private bool _initializationLocked;
+        private readonly Action<WPFContext<TApplication>>? _preContextInitialization;
+        private readonly bool _initializationLocked;
         private SynchronizationContext? _synchronizationContext;
-        IWPFContext IWPFThread.WPFContext => _wpfContext;
+        private IDisposableObjectService _disposableObjectService = null;
+        IWPFContext IWPFThread.WPFContext => this._wpfContext;
 
-        public IWPFContext<TApplication> WPFContext => _wpfContext;
+        public IWPFContext<TApplication> WPFContext => this._wpfContext;
 
         public Thread MainThread { get; }
 
-        public SynchronizationContext SynchronizationContext => _synchronizationContext ?? throw new InvalidOperationException("WPF Thread was not started.");
+        public SynchronizationContext SynchronizationContext => this._synchronizationContext ?? throw new InvalidOperationException("WPF Thread was not started.");
 
-        public JoinableTaskFactory? JoinableTaskFactory => _serviceProvider.GetService<JoinableTaskFactory>();
+        public JoinableTaskFactory? JoinableTaskFactory => this._serviceProvider.GetService<JoinableTaskFactory>();
 
         /// <summary>
         /// 생성자
@@ -35,28 +36,28 @@ namespace MVVMToolKit.Hosting.Internal
         /// <param name="wpfContext">WPFContext</param>
         public WPFThread(IServiceProvider serviceProvider, WPFContext<TApplication> wpfContext)
         {
-            _serviceProvider = serviceProvider;
-            _wpfContext = wpfContext;
+            this._serviceProvider = serviceProvider;
+            this._wpfContext = wpfContext;
             //WPF UI Thread를 생성합니다.
-            MainThread = new Thread(InternalUiThreadStart)
+            this.MainThread = new Thread(this.InternalUiThreadStart)
             {
                 Name = "WPF Main UI Thread",
                 IsBackground = true
             };
             // apartment state를 설정합니다.
-            MainThread.SetApartmentState(ApartmentState.STA);
+            this.MainThread.SetApartmentState(ApartmentState.STA);
         }
 
         /// <inheritdoc />
         public void Start()
         {
-            MainThread.Start();
+            this.MainThread.Start();
         }
 
         /// <inheritdoc />
         public void HandleApplicationExit()
         {
-            if (!_wpfContext.IsRunning)
+            if (!this._wpfContext.IsRunning)
             {
                 return;
             }
@@ -65,10 +66,11 @@ namespace MVVMToolKit.Hosting.Internal
             // UIElement의 Visibility에 관련된 특정 케이스에서 발생합니다.
             // 예를 들면 트레이를 통해 HandleApplicationExit가 수동으로 호출된 경우, StopApplication이 발생합니다.
             // 이를 방지하기 위하여 StopApplication을 호출하기 전에 열려있는 모든 윈도우를 닫습니다.
-            _wpfContext.WPFApplication.CloseAllWindowsIfAny();
+            this._wpfContext.WPFApplication.CloseAllWindowsIfAny();
 
-            var applicationLifeTime = _serviceProvider.GetService<IHostApplicationLifetime>();
+            var applicationLifeTime = this._serviceProvider.GetService<IHostApplicationLifetime>();
             applicationLifeTime?.StopApplication();
+            this._disposableObjectService.Dispose();
         }
 
         /// <summary>
@@ -76,9 +78,9 @@ namespace MVVMToolKit.Hosting.Internal
         /// </summary>
         private void InternalUiThreadStart()
         {
-            PreUIThreadStart();
+            this.PreUIThreadStart();
             // Run the actual code
-            UIThreadStart();
+            this.UIThreadStart();
         }
 
         /// <summary>
@@ -89,28 +91,28 @@ namespace MVVMToolKit.Hosting.Internal
             //SynchronizationContext를 생성합니다.
             var synchronizationContext = new DispatcherSynchronizationContext(Dispatcher.CurrentDispatcher);
             SynchronizationContext.SetSynchronizationContext(new DispatcherSynchronizationContext(Dispatcher.CurrentDispatcher));
-            _synchronizationContext = synchronizationContext;
-
-            var application = CreateApplication();
+            this._synchronizationContext = synchronizationContext;
+            this._disposableObjectService = this._serviceProvider.GetRequiredService<IDisposableObjectService>();
+            var application = this.CreateApplication();
 
             // 현재 WPF Context에서 생명주기를 관리하고 있지 않고 있다면, 생명 주기를 관리하기 위해 이벤트를 등록합니다.
-            if (_wpfContext.ExitHandler == null)
+            if (this._wpfContext.ExitHandler == null)
             {
                 // 호스트 응용프로그램이 종료 되었을때 발생하는 이벤트입니다.
                 application.Exit += (_, _) =>
                 {
-                    HandleApplicationExit();
+                    this.HandleApplicationExit();
                 };
             }
             else
             {
-                application.Exit += _wpfContext.ExitHandler;
+                application.Exit += this._wpfContext.ExitHandler;
             }
 
             // Context에서 현재 응용프로그램을 접근 할 수 있도록 설정합니다.
-            _wpfContext.SetWPFApplication(application);
+            this._wpfContext.SetWPFApplication(application);
             //기본 응용프로그램의 객체들을 초기화 합니다.
-            if (_wpfContext.WPFApplication is IApplicationInitialize initializeApplication)
+            if (this._wpfContext.WPFApplication is IApplicationInitialize initializeApplication)
             {
                 initializeApplication.Initialize();
             }
@@ -122,29 +124,16 @@ namespace MVVMToolKit.Hosting.Internal
         private void UIThreadStart()
         {
             // 응용프로그램이 시작되었다고 체크합니다.
-            _wpfContext.IsRunning = true;
+            this._wpfContext.IsRunning = true;
 
             //WPF 응용프로그램을 시작합니다. 해당 작업은 Blocking 작업입니다.
-            _wpfContext.WPFApplication?.Run();
+            this._wpfContext.WPFApplication?.Run();
         }
 
         private TApplication CreateApplication()
         {
-            var applicationFunction = _serviceProvider.GetRequiredService<Func<TApplication>>();
+            var applicationFunction = this._serviceProvider.GetRequiredService<Func<TApplication>>();
             return applicationFunction.Invoke();
-        }
-
-        /// <summary>
-        /// Pre initialization that happens before <see cref="Application.Run()"/>. This action happens on UI thread.
-        /// </summary>
-        internal void SetPreContextInitialization(Action<IWPFContext<TApplication>> preContextInitialization)
-        {
-            if (_initializationLocked)
-            {
-                throw new InvalidOperationException($"Do not use .UseWpfInitialization<{typeof(TApplication).Name}> and .UseWpfViewModelLocator<{typeof(TApplication).Name}> together or call them multiple times.");
-            }
-            _preContextInitialization = preContextInitialization;
-            _initializationLocked = true;
         }
     }
 }

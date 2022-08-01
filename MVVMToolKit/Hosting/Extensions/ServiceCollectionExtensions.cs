@@ -1,13 +1,13 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Markup;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.VisualStudio.Threading;
 using MVVMToolKit.Hosting.Core;
 using MVVMToolKit.Hosting.GenericHost;
 using MVVMToolKit.Hosting.Internal;
-using System;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Markup;
 
 namespace MVVMToolKit.Hosting.Extensions
 {
@@ -63,23 +63,23 @@ namespace MVVMToolKit.Hosting.Extensions
             services.AddTransient(provider =>
             {
                 var view = createView(provider);
-                if (view is IDisposable disposable)
+                if (view is IDisposableObject disposable)
                 {
-                    var disposables = provider.GetRequiredService<DisposableList<IDisposable>>();
-                    disposables.Add(disposable);
+                    var disposableObjectService = provider.GetRequiredService<IDisposableObjectService>();
+                    disposableObjectService.Add(disposable);
                 }
                 return view;
             });
             return services;
         }
         public static IServiceCollection AddViewModel<TViewModel>(this IServiceCollection services, Func<IServiceProvider, TViewModel> createViewModel)
-            where TViewModel : class, IWPFViewModel, IDisposable
+            where TViewModel : class, IWPFViewModel, IDisposableObject
         {
             services.AddTransient(provider =>
             {
                 var viewModel = createViewModel(provider);
-                var disposables = provider.GetRequiredService<DisposableList<IDisposable>>();
-                disposables.Add(viewModel);
+                var disposableObjectService = provider.GetRequiredService<IDisposableObjectService>();
+                disposableObjectService.Add(viewModel);
                 return viewModel;
             });
             return services;
@@ -87,7 +87,7 @@ namespace MVVMToolKit.Hosting.Extensions
         private static IServiceCollection AddWPFCommonRegistrations<TApplication>(this IServiceCollection services)
             where TApplication : Application
         {
-            services.TryAddSingleton(new DisposableList<IDisposable>());
+            services.TryAddSingleton<IDisposableObjectService, DisposableObjectService>();
 
             //Register WpfContext
             var wpfContext = new WPFContext<TApplication>();

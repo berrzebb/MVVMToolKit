@@ -1,15 +1,14 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.Threading;
 using MVVMToolKit.Hosting.Core;
-using MVVMToolKit.Hosting.Internal;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
 
 namespace MVVMToolKit.Hosting.GenericHost
 {
@@ -30,8 +29,8 @@ namespace MVVMToolKit.Hosting.GenericHost
         private HostOptions HostOptions { get; }
 
         private ILogger Logger { get; }
-        internal readonly DisposableList<IDisposable> _disposable;
 
+        public bool IsRunning { get; internal set; }
         public WPFLifeTime(
             IWPFContext wpfContext,
             IServiceProvider serviceProvider,
@@ -50,36 +49,34 @@ namespace MVVMToolKit.Hosting.GenericHost
             IOptions<HostOptions> hostOptions,
             ILoggerFactory loggerFactory)
         {
-            WPFContext = wpfContext ?? throw new ArgumentNullException(nameof(wpfContext));
-            ServiceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
-            Options = options.Value ?? throw new ArgumentNullException(nameof(options));
-            Environment = environment ?? throw new ArgumentNullException(nameof(environment));
-            ApplicationLifetime = applicationLifetime ?? throw new ArgumentNullException(nameof(applicationLifetime));
-            HostOptions = hostOptions.Value ?? throw new ArgumentNullException(nameof(hostOptions));
-            Logger = loggerFactory.CreateLogger("Microsoft.Hosting.Lifetime");
-            _disposable = serviceProvider.GetRequiredService<DisposableList<IDisposable>>();
+            this.WPFContext = wpfContext ?? throw new ArgumentNullException(nameof(wpfContext));
+            this.ServiceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+            this.Options = options.Value ?? throw new ArgumentNullException(nameof(options));
+            this.Environment = environment ?? throw new ArgumentNullException(nameof(environment));
+            this.ApplicationLifetime = applicationLifetime ?? throw new ArgumentNullException(nameof(applicationLifetime));
+            this.HostOptions = hostOptions.Value ?? throw new ArgumentNullException(nameof(hostOptions));
+            this.Logger = loggerFactory.CreateLogger("Microsoft.Hosting.Lifetime");
         }
-        internal void AddDisposable(IDisposable disposable) => _disposable.Add(disposable);
 
         public Task WaitForStartAsync(CancellationToken cancellationToken)
         {
             //Indicate that we are using our custom lifetime
-            WPFContext.IsLifetime = true;
+            this.WPFContext.IsLifetime = true;
 
 
-            _applicationStartedRegistration = ApplicationLifetime
+            this._applicationStartedRegistration = this.ApplicationLifetime
                 .ApplicationStarted
                 .Register(state => ((WPFLifeTime)state!).OnApplicationStarted(), this);
 
-            _applicationStoppingRegistration = ApplicationLifetime
+            this._applicationStoppingRegistration = this.ApplicationLifetime
                 .ApplicationStopping
                 .Register(state => ((WPFLifeTime)state!).OnApplicationStopping(), this);
 
-            _applicationStoppedRegistration = ApplicationLifetime
+            this._applicationStoppedRegistration = this.ApplicationLifetime
                 .ApplicationStopped
                 .Register(state => ((WPFLifeTime)state!).OnWpfApplicationStopped(), this);
 
-            AppDomain.CurrentDomain.ProcessExit += OnProcessExit;
+            AppDomain.CurrentDomain.ProcessExit += this.OnProcessExit;
             //Applications start immediately.
             return Task.CompletedTask;
         }
@@ -89,69 +86,92 @@ namespace MVVMToolKit.Hosting.GenericHost
         }
         private void OnApplicationStarted()
         {
-            if (!Options.SuppressStatusMessages)
+            if (!this.Options.SuppressStatusMessages)
             {
-                Logger.LogInformation("Wpf application started");
-                Logger.LogInformation("Lifetime: {Lifetime}", nameof(WPFLifeTime));
-                Logger.LogInformation("Hosting environment: {EnvName}", Environment.EnvironmentName);
-                Logger.LogInformation("Content root path: {ContentRoot}", Environment.ContentRootPath);
+                this.Logger.LogInformation("Wpf application started");
+                this.Logger.LogInformation("Lifetime: {Lifetime}", nameof(WPFLifeTime));
+                this.Logger.LogInformation("Hosting environment: {EnvName}", this.Environment.EnvironmentName);
+                this.Logger.LogInformation("Content root path: {ContentRoot}", this.Environment.ContentRootPath);
             }
-            WPFContext.ExitHandler = OnWpfExiting;
+            this.WPFContext.ExitHandler = this.OnWpfExiting;
+            this.IsRunning = true;
         }
         private void OnApplicationStopping()
         {
-            if (!Options.SuppressStatusMessages)
+            if (!this.Options.SuppressStatusMessages)
             {
-                Logger.LogInformation("Wpf application is shutting down...");
+                this.Logger.LogInformation("Wpf application is shutting down...");
             }
 
-            if (WPFContext.WPFApplication is not null)
+            if (this.WPFContext.WPFApplication is not null)
             {
                 //Make sure to do it only on Main UI thread because it have VerifyAccess()
-                var joinableTaskFactory = ServiceProvider.GetService<JoinableTaskFactory>();
+                var joinableTaskFactory = this.ServiceProvider.GetService<JoinableTaskFactory>();
                 if (joinableTaskFactory != null)
                 {
                     //await joinableTaskFactory.SwitchToMainThreadAsync();
-                    WPFContext.WPFApplication.Exit -= OnWpfExiting;
+                    this.WPFContext.WPFApplication.Exit -= this.OnWpfExiting;
                 }
             }
         }
         private void OnWpfApplicationStopped()
         {
-            if (!Options.SuppressStatusMessages)
+            if (!this.Options.SuppressStatusMessages)
             {
-                Logger.LogInformation("Wpf application was stopped.");
+                this.Logger.LogInformation("Wpf application was stopped.");
             }
+        }
+        private async void OnExiting(Action act)
+        {
+            var joinableTaskFactory = this.ServiceProvider.GetService<JoinableTaskFactory>();
+            if (joinableTaskFactory != null)
+            {
+                await joinableTaskFactory.SwitchToMainThreadAsync();
+                var disposableObjectService = this.ServiceProvider.GetRequiredService<IDisposableObjectService>();
+                disposableObjectService.Dispose();
+            } else
+            {
+                Application.Current.Dispatcher.Invoke(() => {
+                    var disposableObjectService = this.ServiceProvider.GetRequiredService<IDisposableObjectService>();
+                    disposableObjectService.Dispose();
+                });
+            }
+            this.ApplicationLifetime.StopApplication();
+            act();
+            this.IsRunning = false;
         }
         private void OnProcessExit(object? sender, EventArgs e)
         {
-            ApplicationLifetime.StopApplication();
-            if (!_shutdownBlock.WaitOne(HostOptions.ShutdownTimeout))
+            this.OnExiting(() =>
             {
-                Logger.LogInformation("Waiting for the host to be disposed, please ensure all 'IHost' instances are wrapped in 'using' blocks");
-            }
+                if (!this._shutdownBlock.WaitOne(this.HostOptions.ShutdownTimeout))
+                {
+                    this.Logger.LogInformation("Waiting for the host to be disposed, please ensure all 'IHost' instances are wrapped in 'using' blocks");
+                }
 
-            //_shutdownBlock.WaitOne();
+                //_shutdownBlock.WaitOne();
 
-            // On Linux if the shutdown is triggered by SIGTERM then that's signaled with the 143 exit code.
-            // Suppress that since we shut down gracefully. https://github.com/aspnet/AspNetCore/issues/6526
-            System.Environment.ExitCode = 0;
+                // On Linux if the shutdown is triggered by SIGTERM then that's signaled with the 143 exit code.
+                // Suppress that since we shut down gracefully. https://github.com/aspnet/AspNetCore/issues/6526
+                System.Environment.ExitCode = 0;
+            });
         }
         private void OnWpfExiting(object? sender, ExitEventArgs e)
         {
-            ApplicationLifetime.StopApplication();
-            Logger.LogInformation("Wpf application is exit");
-            _disposable.Dispose();
+            this.OnExiting(() =>
+            {
+                this.Logger.LogInformation("Wpf application is exit");
+            });
         }
         public void Dispose()
         {
-            _shutdownBlock.Set();
+            this._shutdownBlock.Set();
 
-            AppDomain.CurrentDomain.ProcessExit -= OnProcessExit;
+            AppDomain.CurrentDomain.ProcessExit -= this.OnProcessExit;
 
-            _applicationStartedRegistration.Dispose();
-            _applicationStoppingRegistration.Dispose();
-            _applicationStoppedRegistration.Dispose();
+            this._applicationStartedRegistration.Dispose();
+            this._applicationStoppingRegistration.Dispose();
+            this._applicationStoppedRegistration.Dispose();
         }
     }
 }

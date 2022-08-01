@@ -1,25 +1,34 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System.Threading.Tasks;
+using System.Windows;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MVVMToolKit.Hosting.Extensions;
-using System.Threading.Tasks;
-using System.Windows;
+using MVVMToolKit.Hosting.GenericHost;
 
 namespace MVVMToolKit.Hosting
 {
     public class Startup
     {
-        public async Task RunAsync<TApp>(string[] args)
+        private IHost host = null;
+        private WPFLifeTime wpfLifeTime;
+        public bool IsRunning => this.wpfLifeTime.IsRunning;
+        public async Task StopAsync()
+        {
+            await this.host.StopAsync();
+        }
+        public async Task StartAsync<TApp>(string[] args)
             where TApp : Application
         {
-            using IHost host = Host.CreateDefaultBuilder(args)
-                .ConfigureAppConfiguration(ConfigureAppConfiguration)
-                .ConfigureLogging(ConfigureLogging)
+            this.host = Host.CreateDefaultBuilder(args)
+                .ConfigureAppConfiguration(this.ConfigureAppConfiguration)
+                .ConfigureLogging(this.ConfigureLogging)
                 .UseWPFLifetime()
-                .ConfigureServices(ConfigureServices<TApp>)
+                .ConfigureServices(this.ConfigureServices<TApp>)
                 .Build();
-            await host.RunAsync();
+            await this.host.StartAsync();
+            this.wpfLifeTime = this.host.Services.GetRequiredService<IHostLifetime>() as WPFLifeTime;
         }
         protected virtual void ConfigureLogging(HostBuilderContext context, ILoggingBuilder logging)
         {

@@ -13,35 +13,42 @@ namespace MVVMToolKit.Hosting.Internal
 
         public void Add(T item)
         {
-            CaptureDiposable(item);
-        }
-
-        private void CaptureDiposable(T item)
-        {
             if (item is IDisposable disposable)
             {
-                lock (_lock)
+                lock (this._lock)
                 {
-                    _disposables.Add(disposable);
+                    this._disposables.Add(disposable);
                 }
             }
         }
+        public bool Remove(T item)
+        {
+            bool ret = false;
+            if (item is IDisposable disposable)
+            {
+                lock (this._lock)
+                {
+                    ret = this._disposables.Remove(disposable);
+                }
+            }
+            return ret;
+        }
         public void Dispose()
         {
-            lock (_lock)
+            lock (this._lock)
             {
-                if (_disposed)
+                if (this._disposed)
                 {
                     return;
                 }
 
-                _disposed = true;
-                for (var i = _disposables.Count - 1; i >= 0; i--)
+                this._disposed = true;
+                for (var i = this._disposables.Count - 1; i >= 0; i--)
                 {
-                    var disposable = _disposables[i];
+                    var disposable = this._disposables[i];
                     disposable.Dispose();
                 }
-                _disposables.Clear();
+                this._disposables.Clear();
             }
         }
     }

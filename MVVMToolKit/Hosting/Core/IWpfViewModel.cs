@@ -1,9 +1,8 @@
 ﻿using Prism.Ioc;
-using System;
 
 namespace MVVMToolKit.Hosting.Core
 {
-    public interface IWPFViewModel : IDisposable
+    public interface IWPFViewModel : IDisposableObject
     {
         void InitializeDependency(IContainerProvider containerProvider);
     }

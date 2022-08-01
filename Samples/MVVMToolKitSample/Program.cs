@@ -1,5 +1,5 @@
-﻿using MVVMToolKit.Hosting;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using MVVMToolKit.Hosting;
 
 namespace MVVMToolKitSample
 {
@@ -8,7 +8,12 @@ namespace MVVMToolKitSample
         public async static Task Main(string[] args)
         {
             Startup startup = new Startup();
-            await startup.RunAsync<App>(args);
+            await startup.StartAsync<App>(args);
+            while (startup.IsRunning)
+            {
+
+            }
+            await startup.StopAsync();
         }
     }
 }
