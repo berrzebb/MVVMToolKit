@@ -1,41 +1,36 @@
 ﻿using System;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Messaging;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Toolkit.Mvvm.ComponentModel;
-using Microsoft.Toolkit.Mvvm.Messaging;
 using MVVMToolKit.Hosting.Core;
 using MVVMToolKit.Hosting.Internal;
-using Prism.Ioc;
-using Prism.Regions;
 
 namespace MVVMToolKit.Hosting
 {
     public abstract class ViewModelBase<TViewModel> : ViewModelBase where TViewModel : ViewModelBase
     {
-        protected readonly IRegionManager RegionManager;
-        protected readonly IRegionNavigationService NavigationService;
         protected IMessenger Messenger => WeakReferenceMessenger.Default;
         protected readonly ILogger<TViewModel> Logger;
 
-        protected ViewModelBase(IContainerProvider provider)
+        protected ViewModelBase(IServiceProvider provider)
         {
             this._provider = provider;
-            this.disposableObjectService = provider.Resolve<DisposableObjectService>();
-            this.Logger = provider.Resolve<ILogger<TViewModel>>();
-            this.RegionManager = provider.Resolve<IRegionManager>();
-            this.NavigationService = provider.Resolve<IRegionNavigationService>();
+            this.disposableObjectService = provider.GetRequiredService<IDisposableObjectService>();
+            this.Logger = provider.GetRequiredService<ILogger<TViewModel>>();
             this.InitializeDependency(provider);
         }
 
-        protected override void InitializeDependency(IContainerProvider containerProvider)
+        protected override void InitializeDependency(IServiceProvider containerProvider)
         {
         }
     }
     public abstract class ViewModelBase : ObservableObject, IWPFViewModel
     {
         public Guid Guid { get; set; }
-        protected IDisposableObjectService disposableObjectService;
+        protected IDisposableObjectService? disposableObjectService;
 
-        protected IContainerProvider? _provider = null;
+        protected IServiceProvider? _provider = null;
         private bool disposedValue;
         private readonly DisposableList<IDisposable> _disposables = new DisposableList<IDisposable>();
 
@@ -74,9 +69,9 @@ namespace MVVMToolKit.Hosting
             this.Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }
-        protected abstract void InitializeDependency(IContainerProvider containerProvider);
+        protected abstract void InitializeDependency(IServiceProvider containerProvider);
 
-        void IWPFViewModel.InitializeDependency(IContainerProvider containerProvider)
+        void IWPFViewModel.InitializeDependency(IServiceProvider containerProvider)
         {
             this.InitializeDependency(containerProvider);
         }
