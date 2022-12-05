@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace MVVMToolKit.MVVM
+namespace MVVMToolKit.ViewModels
 {
     public class NotifyObject<T> : INotifyPropertyChanged, INotifyPropertyChanging where T : new()
     {
@@ -24,8 +24,10 @@ namespace MVVMToolKit.MVVM
         public T Value
         {
             get { return this._value; }
-            set {
-                if (!EqualityComparer<T>.Default.Equals(this._value, value)) {
+            set
+            {
+                if (!EqualityComparer<T>.Default.Equals(this._value, value))
+                {
                     this.OnPropertyChanging(nameof(this.Value));
                     this._value = value;
                     this.OnPropertyChanged(nameof(this.Value));
@@ -52,7 +54,7 @@ namespace MVVMToolKit.MVVM
             this.OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
         }
 
-        protected void OnPropertyChanging([CallerMemberName] string ? propertyName = null)
+        protected void OnPropertyChanging([CallerMemberName] string? propertyName = null)
         {
             this.OnPropertyChanging(new PropertyChangingEventArgs(propertyName));
         }

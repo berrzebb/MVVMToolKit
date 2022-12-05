@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Windows.Controls;
+using System.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using MVVMToolKit.Hosting.Core;
 
@@ -8,7 +8,7 @@ namespace MVVMToolKit.Hosting.Extensions
     public static class ServiceCollectionExtensions
     {
         public static IServiceCollection AddView<TView>(this IServiceCollection services)
-            where TView : ContentControl
+            where TView : FrameworkElement
         {
             return services.AddView(provider => ActivatorUtilities.CreateInstance<TView>(provider));
         }
@@ -18,7 +18,7 @@ namespace MVVMToolKit.Hosting.Extensions
             return services.AddViewModel(provider => ActivatorUtilities.CreateInstance<TViewModel>(provider));
         }
         public static IServiceCollection AddView<TView>(this IServiceCollection services, Func<IServiceProvider, TView> createView)
-            where TView : ContentControl
+            where TView : FrameworkElement
         {
             services.AddTransient(provider =>
             {

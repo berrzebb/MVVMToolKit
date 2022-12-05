@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace MVVMToolKit.Ioc
 {
-    internal class ContainerProvider
+    public class ContainerProvider
     {
         internal static IServiceProvider? provider = null;
         

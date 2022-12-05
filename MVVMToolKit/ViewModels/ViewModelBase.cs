@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 using MVVMToolKit.Hosting.Core;
 using MVVMToolKit.Hosting.Internal;
 
-namespace MVVMToolKit.Hosting
+namespace MVVMToolKit.ViewModels
 {
     public abstract class ViewModelBase<TViewModel> : ViewModelBase where TViewModel : ViewModelBase
     {
@@ -15,10 +15,10 @@ namespace MVVMToolKit.Hosting
 
         protected ViewModelBase(IServiceProvider provider)
         {
-            this._provider = provider;
-            this.disposableObjectService = provider.GetRequiredService<IDisposableObjectService>();
-            this.Logger = provider.GetRequiredService<ILogger<TViewModel>>();
-            this.InitializeDependency(provider);
+            _provider = provider;
+            disposableObjectService = provider.GetRequiredService<IDisposableObjectService>();
+            Logger = provider.GetRequiredService<ILogger<TViewModel>>();
+            InitializeDependency(provider);
         }
 
         protected override void InitializeDependency(IServiceProvider containerProvider)
@@ -36,12 +36,12 @@ namespace MVVMToolKit.Hosting
 
         protected IWPFViewModel Add(IDisposable disposable)
         {
-            this._disposables.Add(disposable);
+            _disposables.Add(disposable);
             return this;
         }
         protected virtual void Dispose(bool disposing)
         {
-            if (!this.disposedValue)
+            if (!disposedValue)
             {
                 if (disposing)
                 {
@@ -50,9 +50,9 @@ namespace MVVMToolKit.Hosting
 
                 // TODO: 비관리형 리소스(비관리형 개체)를 해제하고 종료자를 재정의합니다.
                 // TODO: 큰 필드를 null로 설정합니다.
-                this._disposables.Dispose();
-                this.disposableObjectService?.Remove(this);
-                this.disposedValue = true;
+                _disposables.Dispose();
+                disposableObjectService?.Remove(this);
+                disposedValue = true;
             }
         }
 
@@ -66,14 +66,14 @@ namespace MVVMToolKit.Hosting
         public void Dispose()
         {
             // 이 코드를 변경하지 마세요. 'Dispose(bool disposing)' 메서드에 정리 코드를 입력합니다.
-            this.Dispose(disposing: true);
+            Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }
         protected abstract void InitializeDependency(IServiceProvider containerProvider);
 
         void IWPFViewModel.InitializeDependency(IServiceProvider containerProvider)
         {
-            this.InitializeDependency(containerProvider);
+            InitializeDependency(containerProvider);
         }
     }
 }
