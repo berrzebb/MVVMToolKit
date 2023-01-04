@@ -5,9 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MVVMToolKitSample"
         mc:Ignorable="d"
-        xmlns:prism="http://prismlibrary.com/"
         xmlns:vm ="clr-namespace:MVVMToolKitSample.ViewModels"
-        DataContext="{prism:ContainerProvider {x:Type vm:MainWindowViewModel}}"
+        xmlns:ioc="clr-namespace:MVVMToolKit.Ioc;assembly=MVVMToolKit"
+        DataContext="{ioc:ContainerProvider {x:Type vm:MainWindowViewModel}}"
         Title="MainWindow" Height="450" Width="800">
     <StackPanel>
         <TextBlock Text="{Binding Sample}"/>

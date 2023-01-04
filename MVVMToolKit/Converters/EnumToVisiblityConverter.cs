@@ -1,6 +1,4 @@
-﻿using System;
 using System.Globalization;
-using System.Windows;
 using System.Windows.Data;
 
 namespace MVVMToolKit.Converters
@@ -19,21 +17,35 @@ namespace MVVMToolKit.Converters
         /// </summary>
         public Visibility FalseValue { get; set; } = Visibility.Collapsed;
         
-        public object Convert(object value, Type targetType, object? parameter, CultureInfo culture)
+        /// <summary>
+        /// Converts the value
+        /// </summary>
+        /// <param name="value">The value</param>
+        /// <param name="targetType">The target type</param>
+        /// <param name="parameter">The parameter</param>
+        /// <param name="culture">The culture</param>
+        /// <returns>The object</returns>
+        public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
-            string? strEnum = value.ToString();
+            string? strEnum = value?.ToString();
 
             if (parameter != null && parameter.ToString()!.Equals(strEnum))
             {
                 return this.TrueValue;
             }
-            else
-            {
-                return this.FalseValue;
-            }
+
+            return this.FalseValue;
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        /// <summary>
+        /// Converts the back using the specified value
+        /// </summary>
+        /// <param name="value">The value</param>
+        /// <param name="targetType">The target type</param>
+        /// <param name="parameter">The parameter</param>
+        /// <param name="culture">The culture</param>
+        /// <returns>The object</returns>
+        public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
             return Binding.DoNothing;
         }

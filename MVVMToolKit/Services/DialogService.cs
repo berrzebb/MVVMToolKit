@@ -1,7 +1,3 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using MVVMToolKit.Interfaces;
 using MVVMToolKit.Ioc;
@@ -9,15 +5,30 @@ using MVVMToolKit.ViewModels;
 
 namespace MVVMToolKit.Services
 {
+    /// <summary>
+    /// The dialog service class
+    /// </summary>
+    /// <seealso cref="IDialogService"/>
     public class DialogService : IDialogService
     {
+        /// <summary>
+        /// The dialog host dictionary
+        /// </summary>
         private readonly Dictionary<string, Type> _dialogHostDictionary;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DialogService"/> class
+        /// </summary>
         public DialogService()
         {
             // 미리 Capacity를 5개 할당합니다.
             this._dialogHostDictionary = new(5);
         }
+        /// <summary>
+        /// Registers the host type
+        /// </summary>
+        /// <param name="hostType">The host type</param>
+        /// <param name="targetType">The target type</param>
         public void Register(string hostType, Type targetType)
         {
             this._dialogHostDictionary.Add(hostType, targetType);
@@ -36,6 +47,16 @@ namespace MVVMToolKit.Services
             return false;
         }
 
+        /// <summary>
+        /// Updates the view model
+        /// </summary>
+        /// <param name="viewModel">The view model</param>
+        /// <param name="title">The title</param>
+        /// <param name="width">The width</param>
+        /// <param name="height">The height</param>
+        /// <param name="hostType">The host type</param>
+        /// <param name="isModel">The is model</param>
+        /// <exception cref="Exception">팝업 다이얼로그를 생성할 수 없습니다. IDialog 타입이 맞는지 확인하여 주십시오.</exception>
         public void Update(ObservableObject viewModel, string? title, double width, double height, string hostType,
             bool isModel = true)
         {
@@ -77,6 +98,9 @@ namespace MVVMToolKit.Services
             }
         }
 
+        /// <summary>
+        /// Clears this instance
+        /// </summary>
         public void Clear()
         {
             foreach (var window in Application.Current.Windows)

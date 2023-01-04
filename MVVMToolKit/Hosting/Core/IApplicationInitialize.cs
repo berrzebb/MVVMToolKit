@@ -1,5 +1,8 @@
-﻿namespace MVVMToolKit.Hosting.Core
+namespace MVVMToolKit.Hosting.Core
 {
+    /// <summary>
+    /// The application initialize interface
+    /// </summary>
     public interface IApplicationInitialize
     {
         /// <summary>

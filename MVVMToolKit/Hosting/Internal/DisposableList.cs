@@ -1,16 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-
 namespace MVVMToolKit.Hosting.Internal
 {
+    /// <summary>
+    /// The disposable list class
+    /// </summary>
+    /// <seealso cref="IDisposable"/>
     internal class DisposableList<T> : IDisposable
     {
+        /// <summary>
+        /// The disposables
+        /// </summary>
         private readonly List<IDisposable> _disposables = new();
 
+        /// <summary>
+        /// The disposed
+        /// </summary>
         private bool _disposed;
 
+        /// <summary>
+        /// The lock
+        /// </summary>
         private readonly object _lock = new();
 
+        /// <summary>
+        /// Adds the item
+        /// </summary>
+        /// <param name="item">The item</param>
         public void Add(T item)
         {
             if (item is IDisposable disposable)
@@ -21,6 +35,11 @@ namespace MVVMToolKit.Hosting.Internal
                 }
             }
         }
+        /// <summary>
+        /// Describes whether this instance remove
+        /// </summary>
+        /// <param name="item">The item</param>
+        /// <returns>The ret</returns>
         public bool Remove(T item)
         {
             bool ret = false;
@@ -33,6 +52,9 @@ namespace MVVMToolKit.Hosting.Internal
             }
             return ret;
         }
+        /// <summary>
+        /// Disposes this instance
+        /// </summary>
         public void Dispose()
         {
             lock (this._lock)

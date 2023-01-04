@@ -1,14 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
 using MVVMToolKit.Hosting.Core;
 
 namespace MVVMToolKit.Hosting.Internal
 {
+    /// <summary>
+    /// The disposable object service class
+    /// </summary>
+    /// <seealso cref="IDisposableObjectService"/>
     public class DisposableObjectService : IDisposableObjectService    {
+        /// <summary>
+        /// The disposable
+        /// </summary>
         private readonly DisposableList<IDisposable> disposableList = new DisposableList<IDisposable>();
+        /// <summary>
+        /// The disposable
+        /// </summary>
         private readonly Dictionary<Guid, IDisposable> disposableDictionary = new Dictionary<Guid, IDisposable>();
+        /// <summary>
+        /// The disposed value
+        /// </summary>
         private bool disposedValue;
 
+        /// <summary>
+        /// Adds the disposable
+        /// </summary>
+        /// <param name="disposable">The disposable</param>
         public void Add(IDisposableObject disposable)
         {
             disposable.Guid = Guid.NewGuid();
@@ -16,11 +31,20 @@ namespace MVVMToolKit.Hosting.Internal
             this.disposableList.Add(disposable);
         }
 
+        /// <summary>
+        /// Describes whether this instance exists
+        /// </summary>
+        /// <param name="guid">The guid</param>
+        /// <returns>The bool</returns>
         public bool Exists(Guid guid)
         {
             return this.disposableDictionary.ContainsKey(guid);
         }
 
+        /// <summary>
+        /// Removes the disposable
+        /// </summary>
+        /// <param name="disposable">The disposable</param>
         public void Remove(IDisposableObject disposable)
         {
             if (!this.Exists(disposable.Guid))
@@ -35,6 +59,10 @@ namespace MVVMToolKit.Hosting.Internal
 
         }
 
+        /// <summary>
+        /// Disposes the disposing
+        /// </summary>
+        /// <param name="disposing">The disposing</param>
         protected virtual void Dispose(bool disposing)
         {
             if (!this.disposedValue)
@@ -58,6 +86,9 @@ namespace MVVMToolKit.Hosting.Internal
             this.Dispose(disposing: false);
          }
 
+        /// <summary>
+        /// Disposes this instance
+        /// </summary>
         public void Dispose()
         {
             // 이 코드를 변경하지 마세요. 'Dispose(bool disposing)' 메서드에 정리 코드를 입력합니다.

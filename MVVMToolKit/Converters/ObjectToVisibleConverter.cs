@@ -1,22 +1,20 @@
-using System;
 using System.Globalization;
-using System.Windows;
 using System.Windows.Data;
 
 namespace MVVMToolKit.Converters
 {
     /// <summary>
-    /// Object¸¦ Visibility·Î º¯È¯ÇØÁÖ´Â ÄÁ¹öÅÍ
+    /// Objectï¿½ï¿½ Visibilityï¿½ï¿½ ï¿½ï¿½È¯ï¿½ï¿½ï¿½Ö´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     /// </summary>
     /// <seealso cref="IValueConverter"/>
     public class ObjectToVisibleConverter : IValueConverter
     {
         /// <summary>
-        /// ÀÔ·ÂµÈ Boolean°ªÀÌ TrueÀÏ¶§ »ç¿ëµÇ´Â VisibilityÀÔ´Ï´Ù.
+        /// ï¿½Ô·Âµï¿½ Booleanï¿½ï¿½ï¿½ï¿½ Trueï¿½Ï¶ï¿½ ï¿½ï¿½ï¿½Ç´ï¿½ Visibilityï¿½Ô´Ï´ï¿½.
         /// </summary>
         public Visibility TrueValue { get; set; } = Visibility.Visible;
         /// <summary>
-        /// ÀÔ·ÂµÈ Boolean°ªÀÌ FalseÀÏ¶§ »ç¿ëµÇ´Â VisibilityÀÔ´Ï´Ù.
+        /// ï¿½Ô·Âµï¿½ Booleanï¿½ï¿½ï¿½ï¿½ Falseï¿½Ï¶ï¿½ ï¿½ï¿½ï¿½Ç´ï¿½ Visibilityï¿½Ô´Ï´ï¿½.
         /// </summary>
         public Visibility FalseValue { get; set; } = Visibility.Collapsed;
 
@@ -29,7 +27,7 @@ namespace MVVMToolKit.Converters
         /// <param name="parameter">The parameter</param>
         /// <param name="culture">The culture</param>
         /// <returns>The object</returns>
-        public object Convert(object? value, Type targetType, object parameter, CultureInfo culture)
+        public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
             if (value == null)
             {
@@ -37,14 +35,12 @@ namespace MVVMToolKit.Converters
             }
 
             var name = value.GetType().Name;
-            if (name == (string)parameter)
+            if (name == (string?)parameter)
             {
                 return this.TrueValue;
             }
-            else
-            {
-                return this.FalseValue;
-            }
+
+            return this.FalseValue;
         }
 
         /// <summary>

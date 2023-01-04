@@ -1,8 +1,10 @@
-﻿using System;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace MVVMToolKit.Interfaces
 {
+    /// <summary>
+    /// The dialog service interface
+    /// </summary>
     public interface IDialogService
     {
         /// <summary>

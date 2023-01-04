@@ -1,8 +1,11 @@
-﻿using System;
 using System.Windows.Markup;
 
 namespace MVVMToolKit.Ioc
 {
+    /// <summary>
+    /// The container provider extension class
+    /// </summary>
+    /// <seealso cref="MarkupExtension"/>
     public class ContainerProviderExtension : MarkupExtension
     {
         /// <summary>
