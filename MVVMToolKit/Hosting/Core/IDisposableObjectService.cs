@@ -7,20 +7,22 @@ namespace MVVMToolKit.Hosting.Core
     public interface IDisposableObjectService : IDisposable
     {
         /// <summary>
-        /// Adds the disposable
+        /// Adds the disposable.
         /// </summary>
-        /// <param name="disposable">The disposable</param>
+        /// <param name="disposable">The disposable.</param>
         void Add(IDisposableObject disposable);
+
         /// <summary>
-        /// Describes whether this instance exists
+        /// Describes whether this instance exists.
         /// </summary>
-        /// <param name="guid">The guid</param>
-        /// <returns>The bool</returns>
+        /// <param name="guid">Disposable Guid Key</param>
+        /// <returns>Exists Guids Result.</returns>
         bool Exists(Guid guid);
+
         /// <summary>
-        /// Removes the disposable
+        /// Removes the disposable.
         /// </summary>
-        /// <param name="disposable">The disposable</param>
+        /// <param name="disposable">The disposable.</param>
         void Remove(IDisposableObject disposable);
     }
 }

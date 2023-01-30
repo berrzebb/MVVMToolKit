@@ -7,7 +7,7 @@ namespace MVVMToolKit.Converters
     /// Object�� Visibility�� ��ȯ���ִ� ������
     /// </summary>
     /// <seealso cref="IValueConverter"/>
-    public class ObjectToVisibleConverter : IValueConverter
+    public class ObjectTypeToVisibleConverter : IVisibilityConverter
     {
         /// <summary>
         /// �Էµ� Boolean���� True�϶� ���Ǵ� Visibility�Դϴ�.

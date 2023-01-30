@@ -6,7 +6,7 @@ namespace MVVMToolKit.Converters
     /// <summary>
     /// Enum을 Visibility로 변환해주는 컨버터
     /// </summary>
-    public class EnumToVisibilityConverter : IValueConverter
+    public class EnumToVisibilityConverter : IVisibilityConverter
     {
         /// <summary>
         /// 입력된 Enum값이 파라미터와 동일한 경우 사용되는 Visibility입니다.

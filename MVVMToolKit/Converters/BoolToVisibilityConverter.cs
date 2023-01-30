@@ -6,7 +6,7 @@ namespace MVVMToolKit.Converters
     /// <summary>
     /// Bool을 Visibility로 변환해주는 컨버터
     /// </summary>
-    public class BoolToVisibilityConverter : IValueConverter
+    public class BoolToVisibilityConverter : IVisibilityConverter
     {
         /// <summary>
         /// 입력된 Boolean값이 True일때 사용되는 Visibility입니다.

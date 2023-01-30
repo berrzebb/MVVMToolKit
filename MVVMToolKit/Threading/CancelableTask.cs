@@ -14,12 +14,12 @@ namespace MVVMToolKit.Threading
         /// The token source.
         /// </summary>
         private CancellationTokenSource tokenSource;
-        
+
         /// <summary>
         /// The token.
         /// </summary>
         private CancellationToken token;
-        
+
         /// <summary>
         /// The task.
         /// </summary>
