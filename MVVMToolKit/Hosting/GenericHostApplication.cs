@@ -118,6 +118,7 @@ namespace MVVMToolKit.Hosting
         {
             this.disposableService?.Dispose();
             await Host!.StopAsync();
+            Host.Dispose();
             base.OnExit(e);
         }
 
