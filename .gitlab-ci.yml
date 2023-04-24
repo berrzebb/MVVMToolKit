@@ -8,6 +8,8 @@ sonarqube-check:
     key: "${CI_JOB_NAME}"
     paths:
       - .sonar/cache
+  after_script:
+    - git config --global --add safe.directory ${CI_PROJECT_DIR}
   script: 
       - "dotnet tool install --global dotnet-sonarscanner"
       - "export PATH=\"$PATH:$HOME/.dotnet/tools\""
