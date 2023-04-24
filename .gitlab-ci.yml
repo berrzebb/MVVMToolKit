@@ -1,5 +1,5 @@
 sonarqube-check:
-  image: mcr.microsoft.com/dotnet/sdk:6.0.301-nanoserver-20H2
+  image: mcr.microsoft.com/dotnet/sdk:6.0.301-nanoserver-1809
   variables:
     DOTNET_ROLL_FORWARD: Major
     SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Defines the location of the analysis task cache
@@ -9,11 +9,8 @@ sonarqube-check:
     paths:
       - .sonar/cache
   script: 
-      - "apt-get update"
-      - "apt-get install --yes openjdk-11-jre"
       - "dotnet tool install --global dotnet-sonarscanner"
       - "export PATH=\"$PATH:$HOME/.dotnet/tools\""
-      - "git config --global --add safe.directory ${CI_PROJECT_DIR}"
       - "dotnet sonarscanner begin /k:\"development_MVVMToolKit_AYeyDibCNvQwEiho4F9X\" /d:sonar.token=\"$SONAR_TOKEN\" /d:\"sonar.host.url=$SONAR_HOST_URL\" "
       - "dotnet build"
       - "dotnet sonarscanner end /d:sonar.token=\"$SONAR_TOKEN\""
