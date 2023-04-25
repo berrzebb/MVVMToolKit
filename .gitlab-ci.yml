@@ -20,6 +20,6 @@ sonarqube-check:
       /d:sonar.token=\"$SONAR_TOKEN\"
       /d:sonar.host.url=\"$SONAR_HOST_URL\"
       /d:sonar.cs.opencover.reportsPaths=coverage.opencover.xml"
-    - "dotnet build $SOLUTION_PATH -c Release"
+    - "dotnet build"
     - "dotnet sonarscanner end /d:sonar.token=\"$SONAR_TOKEN\""
   allow_failure: true
