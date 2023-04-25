@@ -1,5 +1,4 @@
 sonarqube-check:
-  cache: []
   image: dotnet-sonarscanner:latest
   only:
     - master
@@ -9,6 +8,10 @@ sonarqube-check:
     GIT_CLONE_PATH: ${CI_BUILDS_DIR}/${CI_CONCURRENT_ID}/${CI_PROJECT_NAME}
     SONAR_USER_HOME: "${GIT_CLONE_PATH}/.sonar"  # Defines the location of the analysis task cache
     GIT_DEPTH: "10"  # Tells git to fetch all the branches of the project, required by the analysis task
+  cache:
+    key: "${CI_JOB_NAME}"
+    paths:
+      - .sonar/cache    
   script:
     - "cd $GIT_CLONE_PATH"
     - "dotnet sonarscanner begin /k:\"development_MVVMToolKit_AYeyDibCNvQwEiho4F9X\" /d:sonar.token=\"$SONAR_TOKEN\" /d:\"sonar.host.url=\"$SONAR_HOST_URL\""
