@@ -12,12 +12,12 @@ sonarqube-check:
     key: "${CI_JOB_NAME}"
     paths:
       - .sonar/cache
-  after_script:
+  before_script:
     - "$Env:Path += \";$Env:UserProfile\\.dotnet\\tools\"" 
   script:
     - "cd $GIT_CLONE_PATH"
     - "echo $GIT_CLONE_PATH"
-    - "echo $SONAR_HOST_URL"
+    - "echo $Env:Path"
     - "dotnet sonarscanner begin /k:\"development_MVVMToolKit_AYeyDibCNvQwEiho4F9X\" /d:sonar.token=\"$SONAR_TOKEN\" /d:sonar.host.url=\"$SONAR_HOST_URL\""
     - "dotnet build"
     - "dotnet test --collect:\"XPlat Code Coverage\" --results-directory ./coverage"
