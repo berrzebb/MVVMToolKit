@@ -12,13 +12,13 @@ namespace MVVMToolKit.Behaviors
     public class FrameBehavior: Behavior<Frame>
     {
         /// <summary>
-        /// The navigation source changed
+        /// The navigation source changed.
         /// </summary>
         public static readonly DependencyProperty NavigationSourceProperty =
             DependencyProperty.Register(nameof(NavigationSource), typeof(string), typeof(FrameBehavior), new PropertyMetadata(null, NavigationSourceChanged));
 
         /// <summary>
-        /// Gets or sets the value of the navigation source
+        /// Gets or sets the value of the navigation source.
         /// </summary>
         public string NavigationSource
         {

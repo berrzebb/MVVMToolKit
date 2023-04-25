@@ -1,17 +1,19 @@
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using MVVMToolKit.Helper;
-using MVVMToolKit.Helper.Native;
-using MVVMToolKit.Hosting.Core;
-using MVVMToolKit.Hosting.Internal;
-using MVVMToolKit.Interfaces;
-using MVVMToolKit.Ioc;
-using MVVMToolKit.Services;
-
 namespace MVVMToolKit.Hosting
 {
+    using Grace.AspNetCore.Hosting;
+    using Grace.DependencyInjection;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Hosting;
+    using Microsoft.Extensions.Logging;
+    using MVVMToolKit.Helper;
+    using MVVMToolKit.Helper.Native;
+    using MVVMToolKit.Hosting.Core;
+    using MVVMToolKit.Hosting.Internal;
+    using MVVMToolKit.Interfaces;
+    using MVVMToolKit.Ioc;
+    using MVVMToolKit.Services;
+
     /// <summary>
     /// The generic host application class.
     /// </summary>
@@ -22,12 +24,12 @@ namespace MVVMToolKit.Hosting
         /// Gets the value of the host.
         /// </summary>
         public static IHost? Host { get; private set; }
-        
+
         /// <summary>
         /// The logger.
         /// </summary>
         protected ILogger<GenericHostApplication>? Logger = null;
-        
+
         /// <summary>
         /// The disposable service.
         /// </summary>
@@ -38,12 +40,19 @@ namespace MVVMToolKit.Hosting
         /// </summary>
         protected GenericHostApplication()
         {
-            Host = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder()
+            var builder = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder();
+            Host = builder
+                .UseGrace(new InjectionScopeConfiguration()
+                {
+                    InjectIDisposable = true,
+                })
+                .UseDefaultServiceProvider(this.ConfigureServiceProvider)
                 .ConfigureAppConfiguration(this.ConfigureAppConfiguration)
                 .ConfigureLogging(this.ConfigureLogging)
                 .ConfigureServices(this.ConfigureServices)
                 .Build();
-            ContainerProvider.provider = Host.Services;
+
+            ContainerProvider.Provider = Host.Services;
             this.Dispatcher.UnhandledException += this.Dispatcher_UnhandledException;
             this.Dispatcher.UnhandledExceptionFilter += this.Dispatcher_UnhandledExceptionFilter;
         }
@@ -86,10 +95,10 @@ namespace MVVMToolKit.Hosting
                 this.Logger?.LogCritical("!!DuplicateProcess!!");
                 Current.Shutdown();
             }
-            
+
             return result;
         }
-        
+
         /// <summary>
         /// Ons the startup using the specified e.
         /// </summary>
@@ -106,7 +115,7 @@ namespace MVVMToolKit.Hosting
             {
                 Current.Shutdown(0);
             }
-            
+
             base.OnStartup(e);
         }
 
@@ -133,6 +142,12 @@ namespace MVVMToolKit.Hosting
             configurationBuilder
                 .SetBasePath(context.HostingEnvironment.ContentRootPath)
                 .AddEnvironmentVariables();
+        }
+
+        protected virtual void ConfigureServiceProvider(HostBuilderContext context, ServiceProviderOptions options)
+        {
+            options.ValidateScopes = true;
+            options.ValidateOnBuild = true;
         }
 
         /// <summary>
@@ -224,6 +239,7 @@ namespace MVVMToolKit.Hosting
 
                 this.Logger?.LogError(e.Exception, $"[App Error Catch] {e.Exception}");
                 this.Logger?.LogError(e.Exception, $"[App_DispatcherUnhandledException] {e.Exception.Message}");
+                CoreDumpHelper.CreateMemoryDump();
             }
             catch
             {

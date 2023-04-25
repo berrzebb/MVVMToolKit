@@ -10,28 +10,28 @@ namespace MVVMToolKit.Ioc
         /// <summary>
         /// The provider
         /// </summary>
-        internal static IServiceProvider? provider = null;
-        
+        internal static IServiceProvider? Provider = null;
+
         /// <summary>
-        /// Resolves the type
+        /// Resolves the type.
         /// </summary>
-        /// <param name="type">The type</param>
-        /// <returns>The object</returns>
+        /// <param name="type">The type.</param>
+        /// <returns>The object.</returns>
         public static object? Resolve(Type? type)
         {
-            if (type == null || provider == null)
+            if (type == null || Provider == null)
             {
                 return null;
             }
 
-            return provider.GetRequiredService(type);
+            return Provider.GetRequiredService(type);
         }
 
         /// <summary>
-        /// Resolves
+        /// Resolves.
         /// </summary>
-        /// <typeparam name="T">The </typeparam>
-        /// <returns>The</returns>
+        /// <typeparam name="T">The type.</typeparam>
+        /// <returns>The object.</returns>
         public static T? Resolve<T>()
         {
             Type type = typeof(T);
