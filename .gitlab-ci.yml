@@ -13,7 +13,8 @@ sonarqube-check:
       - $Env:Path += ";$Env:UserProfile\.dotnet\tools"
       - echo $SONAR_TOKEN
       - echo $SONAR_HOST_URL
-      - "dotnet sonarscanner begin /k:\"development_MVVMToolKit_AYeyDibCNvQwEiho4F9X\" /d:sonar.token=\"$SONAR_TOKEN\" /d:\"sonar.host.url=\"$SONAR_HOST_URL\" "
+      - echo "dotnet sonarscanner begin /k:\"development_MVVMToolKit_AYeyDibCNvQwEiho4F9X\" /d:sonar.token=\"$SONAR_TOKEN\" /d:\"sonar.host.url=\"$SONAR_HOST_URL\""
+      - "dotnet sonarscanner begin /k:\"development_MVVMToolKit_AYeyDibCNvQwEiho4F9X\" /d:sonar.token=\"$SONAR_TOKEN\" /d:\"sonar.host.url=\"$SONAR_HOST_URL\""
       - "dotnet build"
       - "dotnet sonarscanner end /d:sonar.token=\"$SONAR_TOKEN\""
   allow_failure: true
