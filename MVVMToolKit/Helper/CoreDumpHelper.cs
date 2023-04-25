@@ -1,13 +1,13 @@
-﻿using System.IO;
-using System.Reflection;
-using System.Runtime.InteropServices;
-
-namespace MVVMToolKit.Helper
+﻿namespace MVVMToolKit.Helper
 {
+    using System.IO;
+    using System.Reflection;
+    using System.Runtime.InteropServices;
+
     public static class CoreDumpHelper
     {
         [DllImport("Dbghelp.dll")]
-        private static extern bool MiniDumpWriteDump(IntPtr hProcess, uint ProcessId, IntPtr hFile, int DumpType, ref MINIDUMP_EXCEPTION_INFORMATION ExceptionParam, IntPtr UserStreamParam, IntPtr CallbackParam);
+        private static extern bool MiniDumpWriteDump(IntPtr hProcess, uint processId, IntPtr hFile, int dumpType, ref MINIDUMP_EXCEPTION_INFORMATION exceptionParam, IntPtr userStreamParam, IntPtr callbackParam);
 
         [DllImport("kernel32.dll")]
         private static extern IntPtr GetCurrentProcess();
@@ -68,7 +68,8 @@ namespace MVVMToolKit.Helper
         }
         public static void CreateMemoryDump()
         {
-             string dirPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+            var assembly = Assembly.GetEntryAssembly();
+            var dirPath = Path.GetDirectoryName(assembly?.Location);
             string exeName = AppDomain.CurrentDomain.FriendlyName;
             string dateTime = DateTime.Now.ToString("[yyyy-MM-dd][HH-mm-ss-fff]");
             var path = $"{dirPath}/[{exeName}]{dateTime}.dmp";
