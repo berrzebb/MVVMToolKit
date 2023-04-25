@@ -11,11 +11,11 @@ sonarqube-check:
   script: 
       - "dotnet tool install --global dotnet-sonarscanner"
       - $Env:Path += ";$Env:UserProfile\.dotnet\tools"
-      - echo $Env:SONAR_TOKEN
-      - echo $Env:SONAR_HOST_URL
-      - "dotnet sonarscanner begin /k:\"development_MVVMToolKit_AYeyDibCNvQwEiho4F9X\" /d:sonar.token=\"$Env:SONAR_TOKEN\" /d:\"sonar.host.url=$Env:SONAR_HOST_URL\" "
+      - echo ${SONAR_TOKEN}
+      - echo ${SONAR_HOST_URL}
+      - "dotnet sonarscanner begin /k:\"development_MVVMToolKit_AYeyDibCNvQwEiho4F9X\" /d:sonar.token=\"${SONAR_TOKEN}\" /d:\"sonar.host.url=\"${SONAR_HOST_URL}\" "
       - "dotnet build"
-      - "dotnet sonarscanner end /d:sonar.token=\"$Env:SONAR_TOKEN\""
+      - "dotnet sonarscanner end /d:sonar.token=\"${SONAR_TOKEN}\""
   allow_failure: true
   rules:
     - if: $CI_COMMIT_BRANCH == 'master'
