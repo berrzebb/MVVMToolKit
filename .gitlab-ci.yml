@@ -15,7 +15,8 @@ sonarqube-check:
   script:
     - "cd $GIT_CLONE_PATH"
     - echo $SONAR_HOST_URL
-    - "dotnet sonarscanner begin /k:\"development_MVVMToolKit_AYeyDibCNvQwEiho4F9X\" /d:sonar.token=\"$SONAR_TOKEN\" /d:\"sonar.host.url=\"$SONAR_HOST_URL\""
+    - "dotnet sonarscanner begin /k:\"development_MVVMToolKit_AYeyDibCNvQwEiho4F9X\" /d:sonar.token=\"$SONAR_TOKEN\" /d:sonar.host.url=\"$SONAR_HOST_URL\""
     - "dotnet build"
+    - "dotnet test --collect:\"XPlat Code Coverage\" --results-directory ./coverage"
     - "dotnet sonarscanner end /d:sonar.token=\"$SONAR_TOKEN\""
   allow_failure: true
