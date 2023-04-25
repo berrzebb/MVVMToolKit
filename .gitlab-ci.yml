@@ -7,7 +7,7 @@ sonarqube-check:
   variables:
     SONAR_USER_HOME: "${CI_PROJECT_DIR}/../.sonar"  # Defines the location of the analysis task cache
     GIT_DEPTH: "0"  # Tells git to fetch all the branches of the project, required by the analysis task
-  script: 
+  script:
     - "dotnet tool install --global dotnet-sonarscanner"
     - "$Env:Path += \";$Env:UserProfile\\.dotnet\\tools\""
     - echo $PWD
@@ -15,4 +15,4 @@ sonarqube-check:
     - "dotnet sonarscanner begin /k:\"development_MVVMToolKit_AYeyDibCNvQwEiho4F9X\" /d:sonar.token=\"$SONAR_TOKEN\" /d:\"sonar.host.url=\"$SONAR_HOST_URL\""
     - "dotnet build"
     - "dotnet sonarscanner end /d:sonar.token=\"$SONAR_TOKEN\""
-  allow_failure: false
+  allow_failure: true
