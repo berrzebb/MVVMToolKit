@@ -17,6 +17,7 @@ sonarqube-check:
     - "cd $GIT_CLONE_PATH"
     - "echo $GIT_CLONE_PATH"
     - "echo $Env:Path"
+    - "echo $PWD"
     - "dotnet sonarscanner begin /k:\"development_MVVMToolKit_AYeyDibCNvQwEiho4F9X\"
       /d:sonar.token=\"$SONAR_TOKEN\"
       /d:sonar.host.url=\"$SONAR_HOST_URL\""
