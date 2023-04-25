@@ -6,7 +6,7 @@ sonarqube-check:
     - /^.*ci-test.*$/
   variables:
     #CI_DEBUG_TRACE: "true"
-    GIT_CLONE_PATH: ${CI_BUILDS_DIR}/${CI_JOB_ID}/${CI_PROJECT_NAME}
+    GIT_CLONE_PATH: ${CI_BUILDS_DIR}/${CI_CONCURRENT_ID}/${CI_PROJECT_NAME}
     SONAR_USER_HOME: "${GIT_CLONE_PATH}/.sonar"  # Defines the location of the analysis task cache
     GIT_DEPTH: "10"  # Tells git to fetch all the branches of the project, required by the analysis task
   script:
