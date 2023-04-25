@@ -1,7 +1,7 @@
-using Microsoft.Extensions.DependencyInjection;
-
 namespace MVVMToolKit.Ioc
 {
+    using Microsoft.Extensions.DependencyInjection;
+
     /// <summary>
     /// The container provider class
     /// </summary>
