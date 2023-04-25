@@ -12,6 +12,8 @@ sonarqube-check:
       - "dotnet tool install --global dotnet-sonarscanner"
       - $Env:Path += ";$Env:UserProfile\.dotnet\tools"
       - echo $Env:Path
+      - echo $Env:SONAR_TOKEN
+      - echo $Env:SONAR_HOST_URL
       - "dotnet sonarscanner begin /k:\"development_MVVMToolKit_AYeyDibCNvQwEiho4F9X\" /d:sonar.token=\"$env:SONAR_TOKEN\" /d:\"sonar.host.url=$env:SONAR_HOST_URL\" "
       - "dotnet build"
       - "dotnet sonarscanner end /d:sonar.token=\"$env:SONAR_TOKEN\""
