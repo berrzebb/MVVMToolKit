@@ -1,6 +1,7 @@
-﻿using Microsoft.Toolkit.Mvvm.ComponentModel;
-using MVVMToolKit.Hosting;
-using Prism.Ioc;
+﻿using System;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using MVVMToolKit.ViewModels;
 
 namespace MVVMToolKitSample.ViewModels
 {
@@ -10,13 +11,13 @@ namespace MVVMToolKitSample.ViewModels
         [ObservableProperty]
         private string? _sample;
 
-        [Microsoft.Toolkit.Mvvm.Input.ICommand]
+        [RelayCommand]
         private void DoomsDay()
         {
             Sample = "Dooms Day";
         }
 
-        public MainWindowViewModel(IContainerProvider containerProvider) : base(containerProvider)
+        public MainWindowViewModel(IServiceProvider containerProvider) : base(containerProvider)
         {
             Sample = "Hello World";
 

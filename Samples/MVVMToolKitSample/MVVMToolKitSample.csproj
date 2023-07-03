@@ -5,8 +5,8 @@
     <TargetFramework>net6.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
-    <StartupObject>MVVMToolKitSample.Program</StartupObject>
-    <Platforms>AnyCPU;x64</Platforms>
+	  <Platforms>AnyCPU;x64</Platforms>
+	  <IsPublishable>False</IsPublishable>
   </PropertyGroup>
 
   <ItemGroup>
@@ -22,6 +22,10 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\MVVMToolKit\MVVMToolKit.csproj" />
   </ItemGroup>
 
 </Project>
