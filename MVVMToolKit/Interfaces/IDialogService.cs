@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using MVVMToolKit.Models;
 
 namespace MVVMToolKit.Interfaces
 {
@@ -29,10 +30,15 @@ namespace MVVMToolKit.Interfaces
         /// <param name="width">팝업 크기.</param>
         /// <param name="height">팝업 크기.</param>
         /// <param name="hostType">팝업창 호스트 타입</param>
-        /// <param name="isModel">Modal 여부</param>
+        /// <param name="isModal">Modal 여부</param>
         void Update(ObservableObject viewModel, string? title, double width, double height, string hostType,
-            bool isModel = true);
-
+            bool isModal = true);
+        /// <summary>
+        /// 다이얼로그 컨텐츠 설정
+        /// </summary>
+        /// <param name="viewModel">컨텐츠에서 사용할 ViewModel</param>
+        /// <param name="options">팝업창 설정</param>
+        void Update(ObservableObject viewModel, PopupOption options);
         /// <summary>
         /// 다이얼로그 정리
         /// </summary>

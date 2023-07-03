@@ -17,6 +17,16 @@ namespace MVVMToolKit.Interfaces
         /// Gets or sets the value of the height
         /// </summary>
         public double Height { get; set; }
+
+        public SizeToContent SizeToContent { get; set; }
+
+        public ResizeMode ResizeMode { get; set; }
+        public WindowStyle WindowStyle { get; set; }
+        public WindowStartupLocation WindowStartupLocation { get; set; }
+        public bool Topmost { get; set; }
+        public bool ShowInTaskbar { get; set; }
+
+        public bool ShowActivated { get; set; }
         /// <summary>
         /// Gets or sets the value of the data context
         /// </summary>

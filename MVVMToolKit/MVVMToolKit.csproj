@@ -14,7 +14,7 @@
     <AssemblyVersion>1.0.0</AssemblyVersion>
     <FileVersion>1.0.0</FileVersion>
     <Version>$([System.DateTime]::Now.ToString("yyyy.MM.dd.HHmmss"))</Version>
-    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
     <IsPublishable>False</IsPublishable>
     <Description>MVVM Tool Kit</Description>
     <PackageProjectUrl>https://gitlab.endcs.net/development/MVVMToolKit</PackageProjectUrl>

@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using MVVMToolKit.Interfaces;
 using MVVMToolKit.Ioc;
+using MVVMToolKit.Models;
 using MVVMToolKit.ViewModels;
 
 namespace MVVMToolKit.Services
@@ -33,7 +34,7 @@ namespace MVVMToolKit.Services
         {
             this._dialogHostDictionary.Add(hostType, targetType);
         }
-        
+
         /// <inheritdoc cref="IDialogService"/>
         public bool CheckActivate(string? title)
         {
@@ -55,12 +56,32 @@ namespace MVVMToolKit.Services
         /// <param name="width">The width</param>
         /// <param name="height">The height</param>
         /// <param name="hostType">The host type</param>
-        /// <param name="isModel">The is model</param>
+        /// <param name="isModal">The is model</param>
         /// <exception cref="Exception">팝업 다이얼로그를 생성할 수 없습니다. IDialog 타입이 맞는지 확인하여 주십시오.</exception>
         public void Update(ObservableObject viewModel, string? title, double width, double height, string hostType,
-            bool isModel = true)
+            bool isModal = true)
         {
-            var hostWindowType = this._dialogHostDictionary[hostType];
+            Update(viewModel, new PopupOption
+            {
+                Title = title,
+                Width = width,
+                Height = height,
+                HostType = hostType,
+                IsModal = isModal
+            });
+        }
+        /// <summary>
+        /// Updates the view model
+        /// </summary>
+        /// <param name="viewModel">The view model</param>
+        /// <param name="options"> 팝업 창 설정</param>
+        /// <exception cref="Exception">팝업 다이얼로그를 생성할 수 없습니다. IDialog 타입이 맞는지 확인하여 주십시오.</exception>
+        public void Update(ObservableObject viewModel, PopupOption options)
+        {
+            if (!this._dialogHostDictionary.TryGetValue(options.HostType, out Type? hostWindowType))
+            {
+                throw new Exception("팝업 다이얼로그를 생성할 수 없습니다. IDialog 타입이 맞는지 확인하여 주십시오.");
+            }
             // ContainerProvider를 통해 등록되어 있는 Window를 취득
             var popup = ContainerProvider.Resolve(hostWindowType) as IDialog;
             if (popup is null)
@@ -82,13 +103,18 @@ namespace MVVMToolKit.Services
 
             if (popup.DataContext is PopupDialogViewModelBase vm)
             {
-                popup.Width = width;
-                popup.Height = height;
-                popup.Title = title;
+                popup.Width = options.Width;
+                popup.Height = options.Height;
+                popup.SizeToContent = options.SizeToContent;
+                popup.ShowActivated = options.ShowActivated;
+                popup.ShowInTaskbar = options.ShowInTaskbar;
+                popup.Topmost = options.Topmost;
+                popup.Title = options.Title;
+                popup.ResizeMode = options.ResizeMode;
                 vm.ViewModel = viewModel;
             }
 
-            if (isModel)
+            if (options.IsModal)
             {
                 popup.ShowDialog();
             }
@@ -97,7 +123,6 @@ namespace MVVMToolKit.Services
                 popup.Show();
             }
         }
-
         /// <summary>
         /// Clears this instance
         /// </summary>
