@@ -16,7 +16,7 @@ sonarqube-check:
     - "echo $CI_PROJECT_DIR"
     - "echo $Env:Path"
     - "echo $pwd"
-    - "dotnet sonarscanner begin /k:\"development_MVVMToolKit_AYeyDibCNvQwEiho4F9X\"
+    - "dotnet sonarscanner begin /k:\"development_MVVMToolKit_AYe3qZpUxjk-gwMvsTkU\"
       /d:sonar.token=\"$SONAR_TOKEN\"
       /d:sonar.host.url=\"$SONAR_HOST_URL\"
       /d:sonar.cs.opencover.reportsPaths=coverage.opencover.xml"
