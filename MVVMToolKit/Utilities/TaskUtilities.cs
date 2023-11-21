@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MVVMToolKit.Interfaces;
+﻿using System.Threading.Tasks;
 
 namespace MVVMToolKit.Utilities
 {
