@@ -1,16 +1,16 @@
 namespace MVVMToolKit.Enums.Dialog
 {
     /// <summary>
-    /// The dialog host type enum
+    /// 다이얼로그 호스트의 타입을 나타내는 열거형입니다.<br/>
     /// </summary>
     public enum DialogHostType
     {
         /// <summary>
-        /// The default dialog host type
+        /// 기본 다이얼로그 호스트 타입을 나타냅니다.<br/>
         /// </summary>
         Default,
         /// <summary>
-        /// The custom dialog host type
+        /// 사용자 정의 다이얼로그 호스트 타입을 나타냅니다.<br/>
         /// </summary>
         Custom
     }

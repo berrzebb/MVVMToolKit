@@ -3,40 +3,50 @@ namespace MVVMToolKit.Ioc
     using Microsoft.Extensions.DependencyInjection;
 
     /// <summary>
-    /// The container provider class
+    /// `ContainerProvider`는 서비스 제공자를 통해 특정 타입의 서비스를 해결하는 클래스입니다.<br/>
     /// </summary>
-    public class ContainerProvider
+    public static class ContainerProvider
     {
         /// <summary>
-        /// The provider
+        /// `Provider`는 서비스 제공자를 저장하는 필드입니다.<br/>
         /// </summary>
-        internal static IServiceProvider? Provider = null;
+        private static IServiceProvider? Provider;
+
+        internal static void Initialize(IServiceProvider? provider)
+        {
+            Provider = provider;
+        }
 
         /// <summary>
-        /// Resolves the type.
+        /// `Resolve` 메서드는 주어진 타입의 서비스를 해결하고 반환합니다.<br/>
+        /// <param name="type">해결할 서비스의 타입입니다.</param>
+        /// <param name="serviceKey">해결할 서비스를 찾을 수 있는 키입니다.</param>
+        /// <returns>해결된 서비스 객체를 반환합니다. 서비스를 해결할 수 없는 경우 null을 반환합니다.</returns>
         /// </summary>
-        /// <param name="type">The type.</param>
-        /// <returns>The object.</returns>
-        public static object? Resolve(Type? type)
+        public static object? Resolve(Type? type, object? serviceKey = null)
         {
             if (type == null || Provider == null)
             {
                 return null;
             }
 
-            return Provider.GetRequiredService(type);
+            return serviceKey is null ? Provider.GetRequiredService(type) : Provider.GetRequiredKeyedService(type, serviceKey);
         }
 
         /// <summary>
-        /// Resolves.
+        /// `Resolve{T}` 메서드는 주어진 타입의 서비스를 해결하고 반환합니다.<br/>
+        /// <typeparam name="T">해결할 서비스의 타입입니다.</typeparam>
+        /// <param name="serviceKey">해결할 서비스를 찾을 수 있는 키입니다.</param>
+        /// <returns>해결된 서비스 객체를 반환합니다. 서비스를 해결할 수 없는 경우 null을 반환합니다.</returns>
         /// </summary>
-        /// <typeparam name="T">The type.</typeparam>
-        /// <returns>The object.</returns>
-        public static T? Resolve<T>()
+        public static T? Resolve<T>(object? serviceKey = null)
         {
-            Type type = typeof(T);
+            if (Provider == null)
+            {
+                return default;
+            }
 
-            return (T?)Resolve(type);
+            return (T?)Resolve(typeof(T), serviceKey);
         }
     }
 }

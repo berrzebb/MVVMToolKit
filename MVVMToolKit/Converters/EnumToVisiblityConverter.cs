@@ -1,22 +1,23 @@
 using System.Globalization;
 using System.Windows.Data;
+using MVVMToolKit.Hosting.Extensions;
 
 namespace MVVMToolKit.Converters
 {
     /// <summary>
-    /// Enum을 Visibility로 변환해주는 컨버터
+    /// Enum 값을 Visibility 값으로 변환하는 컨버터 클래스입니다.
     /// </summary>
-    public class EnumToVisibilityConverter : IVisibilityConverter
+    public class EnumToVisibilityConverter : MarkupConverterExtension<EnumToVisibilityConverter>, IVisibilityConverter
     {
         /// <summary>
-        /// 입력된 Enum값이 파라미터와 동일한 경우 사용되는 Visibility입니다.
+        /// True일 경우 반환할 Visibility 값입니다.
         /// </summary>
         public Visibility TrueValue { get; set; } = Visibility.Visible;
         /// <summary>
-        /// 입력된 Enum값이 파라미터와 동일하지 않은 경우 사용되는 Visibility입니다.
+        /// False일 경우 반환할 Visibility 값입니다.
         /// </summary>
         public Visibility FalseValue { get; set; } = Visibility.Collapsed;
-        
+
         /// <summary>
         /// Converts the value
         /// </summary>
@@ -25,7 +26,7 @@ namespace MVVMToolKit.Converters
         /// <param name="parameter">The parameter</param>
         /// <param name="culture">The culture</param>
         /// <returns>The object</returns>
-        public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+        public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
             string? strEnum = value?.ToString();
 
@@ -45,7 +46,7 @@ namespace MVVMToolKit.Converters
         /// <param name="parameter">The parameter</param>
         /// <param name="culture">The culture</param>
         /// <returns>The object</returns>
-        public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        public override object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
             return Binding.DoNothing;
         }

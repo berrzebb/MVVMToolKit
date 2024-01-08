@@ -1,39 +1,38 @@
 namespace MVVMToolKit.Enums.Dialog
 {
     /// <summary>
-    /// The message popup type enum
+    /// 메시지 팝업의 유형을 나타내는 열거형입니다.<br/>
     /// </summary>
     public enum MessagePopupType
     {
         /// <summary>
-        /// The confirm message popup type
+        /// 확인 메시지 팝업 유형을 나타냅니다.<br/>
         /// </summary>
         Confirm,
-            /// <summary>
-            /// The yes no message popup type
-            /// </summary>
-            YesNo
+        /// <summary>
+        /// 예/아니오 메시지 팝업 유형을 나타냅니다.<br/>
+        /// </summary>
+        YesNo
     }
-
     /// <summary>
-    /// The message popup icon type enum
+    /// 메시지 팝업의 아이콘 유형을 나타내는 열거형입니다.<br/>
     /// </summary>
     public enum MessagePopupIconType
     {
         /// <summary>
-        /// The none message popup icon type
+        /// 아이콘이 없는 메시지 팝업 유형을 나타냅니다.<br/>
         /// </summary>
         None,
         /// <summary>
-        /// The warning message popup icon type
+        /// 경고 아이콘 메시지 팝업 유형을 나타냅니다.<br/>
         /// </summary>
         Warning,
         /// <summary>
-        /// The error message popup icon type
+        /// 오류 아이콘 메시지 팝업 유형을 나타냅니다.<br/>
         /// </summary>
         Error,
         /// <summary>
-        /// The info message popup icon type
+        /// 정보 아이콘 메시지 팝업 유형을 나타냅니다.<br/>
         /// </summary>
         Info
     }

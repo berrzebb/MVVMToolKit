@@ -2,8 +2,9 @@
 
 namespace MVVMToolKit.Ioc.Lifetime
 {
-    public interface IScopedLifeTime : ILifeTime
+    public abstract class ScopedLifeTime : ILifeTime
     {
-        new ServiceLifetime Lifetime => ServiceLifetime.Scoped;
+        public abstract Guid Id { get; }
+        public ServiceLifetime Lifetime => ServiceLifetime.Scoped;
     }
 }

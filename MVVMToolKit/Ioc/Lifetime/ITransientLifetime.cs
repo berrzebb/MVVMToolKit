@@ -2,8 +2,10 @@
 
 namespace MVVMToolKit.Ioc.Lifetime
 {
-    public interface ITransientLifetime : ILifeTime
+    public abstract class TransientLifetime : ILifeTime
     {
-        new ServiceLifetime Lifetime => ServiceLifetime.Transient;
+        public abstract Guid Id { get; }
+        public ServiceLifetime Lifetime => ServiceLifetime.Transient;
+
     }
 }

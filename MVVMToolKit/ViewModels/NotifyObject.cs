@@ -13,13 +13,11 @@ namespace MVVMToolKit.ViewModels
         /// The PropertyChanged.
         /// </summary>
         public event PropertyChangedEventHandler? PropertyChanged;
-        
+
         /// <summary>
         /// The PropertyChanging.
         /// </summary>
         public event PropertyChangingEventHandler? PropertyChanging;
-
-        private static readonly T? InitialValue = default;
 
         /// <summary>
         /// The value.
@@ -40,7 +38,7 @@ namespace MVVMToolKit.ViewModels
         /// </summary>
         public T Value
         {
-            get => this.value; 
+            get => this.value;
             set
             {
                 if (!EqualityComparer<T>.Default.Equals(this.value, value))
@@ -52,27 +50,7 @@ namespace MVVMToolKit.ViewModels
             }
         }
 
-        /// <summary>
-        /// Ons the property changed using the specified e.
-        /// </summary>
-        /// <param name="e">The e.</param>
-        protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
-        {
-            ArgumentNullException.ThrowIfNull(e);
 
-            PropertyChanged?.Invoke(this, e);
-        }
-        
-        /// <summary>
-        /// Ons the property changing using the specified e.
-        /// </summary>
-        /// <param name="e">The e.</param>
-        protected virtual void OnPropertyChanging(PropertyChangingEventArgs e)
-        {
-            ArgumentNullException.ThrowIfNull(e);
-
-            PropertyChanging?.Invoke(this, e);
-        }
 
         /// <summary>
         /// Ons the property changed using the specified property name.
@@ -80,7 +58,10 @@ namespace MVVMToolKit.ViewModels
         /// <param name="propertyName">The property name.</param>
         protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
-            this.OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
+#if NET6_0
+            ArgumentNullException.ThrowIfNull(propertyName);
+#endif
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         /// <summary>
@@ -89,7 +70,10 @@ namespace MVVMToolKit.ViewModels
         /// <param name="propertyName">The property name.</param>
         protected void OnPropertyChanging([CallerMemberName] string? propertyName = null)
         {
-            this.OnPropertyChanging(new PropertyChangingEventArgs(propertyName));
+#if NET6_0
+            ArgumentNullException.ThrowIfNull(propertyName);
+#endif
+            PropertyChanging?.Invoke(this, new PropertyChangingEventArgs(propertyName));
         }
     }
 }

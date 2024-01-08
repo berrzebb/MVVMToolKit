@@ -4,18 +4,14 @@ using Microsoft.Xaml.Behaviors;
 namespace MVVMToolKit.Command
 {
     /// <summary>
-    /// This <see cref="T:System.Windows.Interactivity.TriggerAction`1" /> can be
-    /// used to bind any event on any FrameworkElement to an <see cref="ICommand" />.
-    /// Typically, this element is used in XAML to connect the attached element
-    /// to a command located in a ViewModel. This trigger can only be attached
-    /// to a FrameworkElement or a class deriving from FrameworkElement.
-    /// <para>To access the EventArgs of the fired event, use a RelayCommand&lt;EventArgs&gt;
-    /// and leave the CommandParameter and CommandParameterValue empty!</para>
+    /// 이 <see cref="T:System.Windows.Interactivity.TriggerAction`1" />는 어떤 FrameworkElement의 어떤 이벤트든지 <see cref="ICommand" />에 바인딩하는 데 사용할 수 있습니다.
+    /// 일반적으로, 이 요소는 XAML에서 첨부된 요소를 ViewModel에 위치한 명령어에 연결하는 데 사용됩니다. 이 트리거는 FrameworkElement 또는 FrameworkElement에서 파생된 클래스에만 첨부할 수 있습니다.
+    /// <para>발생한 이벤트의 EventArgs에 접근하려면, RelayCommand&lt;EventArgs&gt;를 사용하고 CommandParameter와 CommandParameterValue를 비워두세요!</para>
     /// </summary>
     public class EventToCommand : TriggerAction<DependencyObject>
     {
         /// <summary>
-        /// Identifies the <see cref="Command" /> dependency property
+        /// <see cref="Command" /> 종속성 속성을 식별합니다.
         /// </summary>
         public static readonly DependencyProperty CommandProperty = DependencyProperty.Register(
             nameof(ICommand),
@@ -25,13 +21,13 @@ namespace MVVMToolKit.Command
                 null,
                 (s, e) => OnCommandChanged(s as EventToCommand, e)));
         /// <summary>
-        /// Identifies the <see cref="CommandParameter" /> dependency property
+        /// <see cref="CommandParameter" /> 종속성 속성을 식별합니다.
         /// </summary>
         public static readonly DependencyProperty CommandParameterProperty = DependencyProperty.Register(
             nameof(CommandParameter),
             typeof(object),
             typeof(EventToCommand),
-            
+
             new PropertyMetadata(null, (s, e) =>
             {
                 var sender = s as EventToCommand;
@@ -44,13 +40,13 @@ namespace MVVMToolKit.Command
                 {
                     return;
                 }
-                
+
                 sender.EnableDisableElement();
             })
             );
-        
+
         /// <summary>
-        /// Identifies the <see cref="MustToggleIsEnabled" /> dependency property
+        /// <see cref="MustToggleIsEnabled" /> 종속성 속성을 식별합니다.
         /// </summary>
         public static readonly DependencyProperty MustToggleIsEnabledProperty = DependencyProperty.Register(
             nameof(MustToggleIsEnabled),
@@ -73,51 +69,49 @@ namespace MVVMToolKit.Command
 
                     sender.EnableDisableElement();
                 }));
-        
+
         /// <summary>
-        /// Identifies the <see cref="EventArgsConverterParameter" /> dependency property.
+        /// <see cref="EventArgsConverterParameter" /> 종속성 속성을 식별합니다.
         /// </summary>
         public static readonly DependencyProperty EventArgsConverterParameterProperty = DependencyProperty.Register(
             nameof(EventArgsConverterParameter),
             typeof(object),
             typeof(EventToCommand),
             new PropertyMetadata(null));
-        
+
         /// <summary>
-        /// Identifies the <see cref="AlwaysInvokeCommand" /> dependency property.
+        /// <see cref="AlwaysInvokeCommand" /> 종속성 속성을 식별합니다.
         /// </summary>
         public static readonly DependencyProperty AlwaysInvokeCommandProperty = DependencyProperty.Register(
             nameof(AlwaysInvokeCommand),
             typeof(bool),
             typeof(EventToCommand),
             new PropertyMetadata(false));
-        
+
         /// <summary>
-        /// Gets or sets the ICommand that this trigger is bound to. This
-        /// is a DependencyProperty.
+        /// 이 트리거가 바인딩된 ICommand를 가져오거나 설정합니다. 이것은 종속성 속성입니다.
         /// </summary>
         public ICommand Command
         {
             get => (ICommand)this.GetValue(CommandProperty);
             set => this.SetValue(CommandProperty, value);
         }
-        
+
         /// <summary>
-        /// Gets or sets an object that will be passed to the <see cref="Command" />
-        /// attached to this trigger. This is a DependencyProperty.
+        /// 이 트리거에 첨부된 <see cref="Command" />에 전달될 객체를 가져오거나 설정합니다. 이것은 종속성 속성입니다.
         /// </summary>
         public object? CommandParameter
         {
             get => this.GetValue(CommandParameterProperty);
             set => this.SetValue(CommandParameterProperty, value);
         }
-        
+
         /// <summary>
-        /// Gets or sets a value indicating whether the attached element must be
-        /// disabled when the <see cref="Command" /> property's CanExecuteChanged
-        /// event fires. If this property is true, and the command's CanExecute 
-        /// method returns false, the element will be disabled. If this property
-        /// is false, the element will not be disabled when the command's
+        /// <see cref="Command" /> 속성의 CanExecuteChanged
+        /// 이벤트가 발생할 때 첨부된 요소가 비활성화되어야 하는지 여부를 나타내는 값을 가져오거나 설정합니다.
+        /// 이 속성이 true이고, 커맨드의 CanExecute 메서드가 false를 반환하면, 요소는 비활성화됩니다.
+        /// 이 속성이 false인 경우, 커맨드의 CanExecute 메서드가 변경되어도 요소는 비활성화되지 않습니다.
+        /// 이것은 DependencyProperty입니다.
         /// CanExecute method changes. This is a DependencyProperty.
         /// </summary>
         public bool MustToggleIsEnabled
@@ -126,43 +120,40 @@ namespace MVVMToolKit.Command
 
             set => this.SetValue(MustToggleIsEnabledProperty, value);
         }
-        
+
         /// <summary>
-        /// Gets or sets a parameters for the converter used to convert the EventArgs when using
-        /// <see cref="PassEventArgsToCommand"/>. If PassEventArgsToCommand is false,
-        /// this property is never used. This is a dependency property.
+        /// <see cref="PassEventArgsToCommand"/>를 사용할 때 EventArgs를 변환하는 데 사용되는 변환기에 대한 매개변수를 가져오거나 설정합니다.
+        /// PassEventArgsToCommand가 false인 경우, 이 속성은 사용되지 않습니다. 이것은 종속성 속성입니다.
+
         /// </summary>
         public object EventArgsConverterParameter
         {
             get => this.GetValue(EventArgsConverterParameterProperty);
             set => this.SetValue(EventArgsConverterParameterProperty, value);
         }
-        
+
         /// <summary>
-        /// Gets or sets a value indicating if the command should be invoked even
-        /// if the attached control is disabled. This is a dependency property.
+        /// 첨부된 컨트롤이 비활성화되어 있어도 명령이 호출되어야 하는지 여부를 나타내는 값을 가져오거나 설정합니다.<br/>
+        /// 이것은 종속성 속성입니다.
         /// </summary>
         public bool AlwaysInvokeCommand
         {
             get => (bool)this.GetValue(AlwaysInvokeCommandProperty);
             set => this.SetValue(AlwaysInvokeCommandProperty, value);
         }
-        
+
         /// <summary>
-        /// Specifies whether the EventArgs of the event that triggered this
-        /// action should be passed to the bound RelayCommand. If this is true,
-        /// the command should accept arguments of the corresponding
-        /// type (for example RelayCommand&lt;MouseButtonEventArgs&gt;).
+        /// 이 액션을 트리거한 이벤트의 EventArgs가 바인딩된 RelayCommand에 전달되어야 하는지를 지정합니다. <br/>
+        /// 이 값이 true인 경우, 명령은 해당 타입의 인수를 받아들여야 합니다(예: RelayCommand&lt;MouseButtonEventArgs&gt;).
         /// </summary>
         public bool PassEventArgsToCommand { get; set; }
-        
+
         /// <summary>
-        /// Gets or sets a converter used to convert the EventArgs when using
-        /// <see cref="PassEventArgsToCommand"/>. If PassEventArgsToCommand is false,
-        /// this property is never used.
+        /// <see cref="PassEventArgsToCommand"/>를 사용할 때 EventArgs를 변환하는 데 사용되는 변환기를 가져오거나 설정합니다.<br/>
+        /// PassEventArgsToCommand가 false인 경우, 이 속성은 사용되지 않습니다.
         /// </summary>
         public IEventArgsConverter? EventArgsConverter { get; set; }
-        
+
         /// <summary>
         /// Called when this trigger is attached to a FrameworkElement.
         /// </summary>
@@ -171,12 +162,12 @@ namespace MVVMToolKit.Command
             base.OnAttached();
             this.EnableDisableElement();
         }
-        
+
         public void Invoke()
         {
             this.Invoke(null);
         }
-        
+
         protected override void Invoke(object? parameter)
         {
             if (this.AssociatedElementIsDisabled() && !this.AlwaysInvokeCommand)
@@ -186,11 +177,11 @@ namespace MVVMToolKit.Command
 
             var command = this.Command;
             var commandParameter = this.CommandParameter;
-            
+
             if (this.PassEventArgsToCommand)
             {
-                    commandParameter = this.EventArgsConverter?.Convert(parameter, this.EventArgsConverterParameter) ??
-                                       parameter;
+                commandParameter = this.EventArgsConverter?.Convert(parameter, this.EventArgsConverterParameter) ??
+                                   parameter;
             }
 
             if (command.CanExecute(commandParameter))
@@ -209,10 +200,10 @@ namespace MVVMToolKit.Command
 
             if (e.OldValue != null)
             {
-                ((ICommand) e.OldValue).CanExecuteChanged -= element.OnCommandCanExecuteChanged;
+                ((ICommand)e.OldValue).CanExecuteChanged -= element.OnCommandCanExecuteChanged;
             }
 
-            var command = (ICommand?) e.NewValue;
+            var command = (ICommand?)e.NewValue;
 
             if (command != null)
             {
