@@ -1,10 +1,10 @@
-﻿namespace MVVMToolKit
+﻿namespace MVVMToolKit.Templates
 {
     using System.Windows.Controls;
-    using Interfaces;
-    using Interfaces.MappingGenerator;
-    using Ioc;
-    public static class ViewFactory
+    using MVVMToolKit.Ioc;
+    using MVVMToolKit.Navigation.Mapping;
+
+    internal static class ViewFactory
     {
         private static readonly Dictionary<Type, UserControl> ViewCache = new();
 
@@ -72,7 +72,7 @@
     }
 
 
-    public sealed class ViewProxy : UserControl
+    internal sealed class ViewProxy : UserControl
     {
         public static readonly DependencyProperty ViewTypeProperty = DependencyProperty.Register(
             name: nameof(ViewType),
@@ -105,7 +105,7 @@
 
         private void UpdateView()
         {
-            var targetViewType = ViewType;
+            var targetViewType = this.ViewType;
             if (this.ViewMode == ViewMode.Selector)
             {
                 if (this.DataContext is not INotifyPropertyChanged viewModel) return;
@@ -120,63 +120,63 @@
                 }
             }
 
-            if (targetViewType == CurrentView) return;
-            Content = ViewFactory.GetView(this, ViewCacheMode, targetViewType);
-            CurrentView = Content?.GetType().Name ?? default;
+            if (targetViewType == this.CurrentView) return;
+            this.Content = ViewFactory.GetView(this, this.ViewCacheMode, targetViewType);
+            this.CurrentView = this.Content?.GetType().Name ?? default;
 
         }
         private string? CurrentView { get; set; }
         public string? ViewType
         {
-            get => (string?)GetValue(ViewTypeProperty);
-            set => SetValue(ViewTypeProperty, value);
+            get => (string?)this.GetValue(ViewTypeProperty);
+            set => this.SetValue(ViewTypeProperty, value);
         }
         public ViewCacheMode ViewCacheMode
         {
-            get => (ViewCacheMode)GetValue(ViewCacheModeProperty);
-            set => SetValue(ViewCacheModeProperty, value);
+            get => (ViewCacheMode)this.GetValue(ViewCacheModeProperty);
+            set => this.SetValue(ViewCacheModeProperty, value);
         }
         public ViewMode ViewMode
         {
-            get => (ViewMode)GetValue(ViewModeProperty);
-            set => SetValue(ViewModeProperty, value);
+            get => (ViewMode)this.GetValue(ViewModeProperty);
+            set => this.SetValue(ViewModeProperty, value);
         }
         public Func<INotifyPropertyChanged, string>? ViewSelector
         {
-            get => (Func<INotifyPropertyChanged, string>?)GetValue(ViewSelectorProperty);
-            set => SetValue(ViewSelectorProperty, value);
+            get => (Func<INotifyPropertyChanged, string>?)this.GetValue(ViewSelectorProperty);
+            set => this.SetValue(ViewSelectorProperty, value);
         }
         public ViewProxy()
         {
-            this.Loaded += OnLoaded;
-            this.Unloaded += OnUnloaded;
+            this.Loaded += this.OnLoaded;
+            this.Unloaded += this.OnUnloaded;
         }
 
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
-            if (DataContext is INotifyPropertyChanged propertyChanged)
+            if (this.DataContext is INotifyPropertyChanged propertyChanged)
             {
-                propertyChanged.PropertyChanged += PropertyChangedOnPropertyChanged;
+                propertyChanged.PropertyChanged += this.PropertyChangedOnPropertyChanged;
             }
-            UpdateView();
+            this.UpdateView();
 
         }
 
         private void PropertyChangedOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            if (ViewMode == ViewMode.Selector)
+            if (this.ViewMode == ViewMode.Selector)
             {
-                UpdateView();
+                this.UpdateView();
             }
         }
 
         private void OnUnloaded(object sender, RoutedEventArgs e)
         {
-            if (DataContext is INotifyPropertyChanged propertyChanged)
+            if (this.DataContext is INotifyPropertyChanged propertyChanged)
             {
-                propertyChanged.PropertyChanged -= PropertyChangedOnPropertyChanged;
+                propertyChanged.PropertyChanged -= this.PropertyChangedOnPropertyChanged;
             }
-            this.Unloaded -= OnUnloaded;
+            this.Unloaded -= this.OnUnloaded;
             this.Content = null;
         }
     }

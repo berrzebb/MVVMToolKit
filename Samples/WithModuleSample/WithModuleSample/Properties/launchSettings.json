@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "WithModuleSample": {
+      "commandName": "Project",
+      "nativeDebugging": false
+    }
+  }
+}

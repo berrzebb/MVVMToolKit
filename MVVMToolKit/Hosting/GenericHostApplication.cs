@@ -10,14 +10,16 @@ using MVVMToolKit.Hosting.Core;
 using MVVMToolKit.Hosting.Extensions;
 using MVVMToolKit.Hosting.Internal;
 using MVVMToolKit.Interfaces;
-using MVVMToolKit.Interfaces.Modules;
-using MVVMToolKit.Interfaces.ViewMapper;
 using MVVMToolKit.Ioc;
+using MVVMToolKit.Navigation.Mapping;
 using MVVMToolKit.Services;
+using MVVMToolKit.Threading.UI;
 using MVVMToolKit.Utilities;
 
 namespace MVVMToolKit.Hosting
 {
+    using Ioc.Modules;
+
     /// <summary>
     /// The generic host application class.
     /// </summary>
@@ -37,10 +39,10 @@ namespace MVVMToolKit.Hosting
         /// <summary>
         /// The disposable service.
         /// </summary>
-        private IDisposableObjectService? disposableService;
+        private IDisposableObjectService? _disposableService;
 
         private readonly IModuleCatalog? _moduleCatalog;
-        private readonly IMappingBuilder _builder = new MappingBuilder();
+        private readonly IMappingRegistry _mappingRegistry = new MappingBuilder();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GenericHostApplication"/> class.
@@ -67,33 +69,29 @@ namespace MVVMToolKit.Hosting
             Dispatcher.UnhandledExceptionFilter += Dispatcher_UnhandledExceptionFilter;
         }
 
-        private void OnSafeFireAndForgetExceptionHandler(Exception? ex)
-        {
-            Logger?.LogError(ex, $"[SafeFireAndForget]");
-        }
+        private void OnSafeFireAndForgetExceptionHandler(Exception? ex) => Logger?.LogError(ex, $"[SafeFireAndForget]");
+
         private void OnInitializeMapping()
         {
-            var mappingResources = _builder.Build();
+            if (_mappingRegistry is not IMappingBuilder mappingBuilder)
+            {
+                return;
+            }
+            ResourceDictionary mappingResources = mappingBuilder.Build();
             Resources.MergedDictionaries.Add(mappingResources);
 
         }
         private void OnInitializeModule()
         {
             if (_moduleCatalog == null) return;
-            foreach (var module in _moduleCatalog.Modules)
+            foreach (IModule module in _moduleCatalog.Modules)
             {
                 module.Initialize(Host?.Services).SafeFireAndForget();
             }
         }
 
-        private IModuleCatalog CreateModuleCatalog_Internal()
-        {
-            return CreateModuleCatalog();
-        }
-        private void InitializeModuleCatalog_Internal(IModuleCatalog moduleCatalog)
-        {
-            InitializeModuleCatalog(moduleCatalog);
-        }
+        private IModuleCatalog CreateModuleCatalog_Internal() => CreateModuleCatalog();
+        private void InitializeModuleCatalog_Internal(IModuleCatalog moduleCatalog) => InitializeModuleCatalog(moduleCatalog);
 
         protected virtual IModuleCatalog CreateModuleCatalog() => new DirectoryModuleCatalog("Modules");
 
@@ -148,17 +146,6 @@ namespace MVVMToolKit.Hosting
             return result;
         }
 
-
-        protected GenericHostApplication AddMapping<TViewModel>(IViewConfiguration configuration)
-        {
-            _builder.AddMapping<TViewModel>(configuration);
-            return this;
-        }
-        protected GenericHostApplication AddMapping(Uri uri)
-        {
-            _builder.AddMapping(uri);
-            return this;
-        }
         /// <summary>
         /// Ons the startup using the specified e.
         /// </summary>
@@ -168,7 +155,7 @@ namespace MVVMToolKit.Hosting
             await Host!.StartAsync();
 
             Logger = Host.Services.GetRequiredService<ILogger<GenericHostApplication>>();
-            disposableService = Host.Services.GetRequiredService<IDisposableObjectService>();
+            _disposableService = Host.Services.GetRequiredService<IDisposableObjectService>();
 
             if (CheckDuplicateProcess())
             {
@@ -189,7 +176,7 @@ namespace MVVMToolKit.Hosting
         /// <param name="e">The e. </param>
         protected override async void OnExit(ExitEventArgs e)
         {
-            disposableService?.Dispose();
+            _disposableService?.Dispose();
             await Host!.StopAsync();
             base.OnExit(e);
         }
@@ -201,12 +188,10 @@ namespace MVVMToolKit.Hosting
         /// <param name="configurationBuilder">The configuration builder.</param>
         protected virtual void ConfigureAppConfiguration(
             HostBuilderContext context,
-            IConfigurationBuilder configurationBuilder)
-        {
+            IConfigurationBuilder configurationBuilder) =>
             configurationBuilder
                 .SetBasePath(context.HostingEnvironment.ContentRootPath)
                 .AddEnvironmentVariables();
-        }
 
         protected virtual void ConfigureServiceProvider(HostBuilderContext context, ServiceProviderOptions options)
         {
@@ -219,10 +204,7 @@ namespace MVVMToolKit.Hosting
         /// </summary>
         /// <param name="context">The context.</param>
         /// <param name="logging">The logging.</param>
-        protected virtual void ConfigureLogging(HostBuilderContext context, ILoggingBuilder logging)
-        {
-            logging.AddJsonConsole();
-        }
+        protected virtual void ConfigureLogging(HostBuilderContext context, ILoggingBuilder logging) => logging.AddJsonConsole();
 
         /// <summary>
         /// Configures the services using the specified host context.
@@ -243,7 +225,9 @@ namespace MVVMToolKit.Hosting
             services.AddSingleton<IDisposableObjectService, DisposableObjectService>();
 
             services.AddSingleton<IDialogService, DialogService>();
-            foreach (var module in _moduleCatalog.Modules)
+
+            IEnumerable<IModule> currentModules = this._moduleCatalog?.Modules.ToArray() ?? Array.Empty<IModule>();
+            foreach (IModule module in currentModules)
             {
                 module.ConfigureServices(services);
             }
@@ -251,12 +235,12 @@ namespace MVVMToolKit.Hosting
             InitializeViewModels(services);
             InitializeViews(services);
 
-            foreach (var module in _moduleCatalog.Modules)
+            foreach (IModule module in currentModules)
             {
-                module.ConfigureMappings(_builder);
+                module.ConfigureMappings(_mappingRegistry);
             }
 
-            InitializeMappings(_builder);
+            InitializeMappings(_mappingRegistry);
         }
 
 
@@ -284,7 +268,7 @@ namespace MVVMToolKit.Hosting
         {
         }
 
-        protected virtual void InitializeMappings(IMappingBuilder builder)
+        protected virtual void InitializeMappings(IMappingRegistry registry)
         {
         }
         /// <summary>
