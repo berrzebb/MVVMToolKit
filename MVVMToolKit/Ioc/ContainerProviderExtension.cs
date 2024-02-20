@@ -19,15 +19,28 @@ namespace MVVMToolKit.Ioc
         /// Initializes a new instance of the <see cref="ContainerProviderExtension"/> class.
         /// </summary>
         /// <param name="type">The type to Resolve</param>
-        public ContainerProviderExtension(Type? type)
+        /// <param name="serviceKey">Service Key(Optional)</param>
+        public ContainerProviderExtension(Type? type, object? serviceKey)
         {
             this.Type = type;
+            this.ServiceKey = serviceKey;
         }
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ContainerProviderExtension"/> class.
+        /// </summary>
+        /// <param name="type">The type to Resolve</param>
+        /// <param name="serviceKey">Service Key(Optional)</param>
+        public ContainerProviderExtension(Type? type) : this(type, default)
+        {
+        }
         /// <summary>
         /// The type to Resolve
         /// </summary>
-        public Type? Type { get; set; }
+        public Type? Type { get; }
+        /// <summary>
+        /// The type to Resolve
+        /// </summary>
+        public object? ServiceKey { get; }
 
         /// <summary>
         /// Provide resolved object from <see cref="ContainerLocator"/>
@@ -36,7 +49,7 @@ namespace MVVMToolKit.Ioc
         /// <returns></returns>
         public override object? ProvideValue(IServiceProvider serviceProvider)
         {
-            return ContainerProvider.Resolve(this.Type);
+            return ContainerProvider.Resolve(this.Type, this.ServiceKey);
         }
     }
 }

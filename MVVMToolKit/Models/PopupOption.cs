@@ -1,4 +1,4 @@
-﻿using MVVMToolKit.Enums.Dialog;
+﻿using MVVMToolKit.Interfaces;
 
 namespace MVVMToolKit.Models
 {

@@ -25,12 +25,23 @@ namespace MVVMToolKit.Ioc
         /// </summary>
         public static object? Resolve(Type? type, object? serviceKey = null)
         {
+            object? instance = default;
             if (type == null || Provider == null)
             {
-                return null;
+                return instance;
+            }
+            if (Provider is IKeyedServiceProvider requiredServiceSupportingProvider)
+            {
+                instance = serviceKey is null
+                    ? requiredServiceSupportingProvider.GetService(type)
+                    : requiredServiceSupportingProvider.GetKeyedService(type, serviceKey);
+            }
+            else
+            {
+                instance = Provider.GetService(type);
             }
 
-            return serviceKey is null ? Provider.GetRequiredService(type) : Provider.GetRequiredKeyedService(type, serviceKey);
+            return instance;
         }
 
         /// <summary>
@@ -47,6 +58,14 @@ namespace MVVMToolKit.Ioc
             }
 
             return (T?)Resolve(typeof(T), serviceKey);
+        }
+        public static Lazy<object?> ResolveLazy(Type? type, object? serviceKey = null)
+        {
+            return new Lazy<object?>(() => Resolve(type, serviceKey));
+        }
+        public static Lazy<T?> ResolveLazy<T>(object? serviceKey = null)
+        {
+            return new Lazy<T?>(() => Resolve<T>(serviceKey));
         }
     }
 }

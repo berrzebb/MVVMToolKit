@@ -108,8 +108,9 @@ namespace MVVMToolKit.Helper
                     streamWriter.Write(xmlData);
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                return;
             }
         }
 
@@ -128,18 +129,14 @@ namespace MVVMToolKit.Helper
                 XmlWriterSettings settings = new XmlWriterSettings
                 {
                     Indent = true,
-                    
-                    // settings.Encoding = Encoding.UTF8;
                 };
 
-                using (XmlWriter xmlWriter = XmlWriter.Create(sb, settings))
-                {
-                    DataContractSerializer serializer = new DataContractSerializer(typeof(T));
-                    serializer.WriteObject(xmlWriter, obj);
-                    xmlWriter.Flush();
+                using XmlWriter xmlWriter = XmlWriter.Create(sb, settings);
+                DataContractSerializer serializer = new DataContractSerializer(typeof(T));
+                serializer.WriteObject(xmlWriter, obj);
+                xmlWriter.Flush();
 
-                    return sb.ToString();
-                }
+                return sb.ToString();
             }
             catch (Exception)
             {

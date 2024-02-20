@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MVVMToolKit.Hosting.Core;
+using MVVMToolKit.Interfaces;
 
 namespace MVVMToolKit.ViewModels
 {
@@ -23,8 +24,10 @@ namespace MVVMToolKit.ViewModels
         protected ViewModelBase(IServiceProvider provider)
         {
             this.currentProvider = provider;
+            this.dispatcherService = this.currentProvider.GetRequiredService<IDispatcherService>();
             this.disposableObjectService = this.currentProvider.GetRequiredService<IDisposableObjectService>();
             this.Logger = this.currentProvider.GetRequiredService<ILogger<TViewModel>>();
+            Logger.LogDebug($"{typeof(TViewModel).Name} Initialize.");
             this.Initialize(this.currentProvider);
         }
 
@@ -33,7 +36,7 @@ namespace MVVMToolKit.ViewModels
 
             this.InitializeDependency(provider);
         }
-        
+
         /// <summary>
         /// Initializes the dependency using the specified container provider.
         /// </summary>

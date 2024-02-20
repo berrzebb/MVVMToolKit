@@ -1,4 +1,3 @@
-using CommunityToolkit.Mvvm.ComponentModel;
 using MVVMToolKit.Interfaces;
 using MVVMToolKit.Ioc;
 using MVVMToolKit.Models;
@@ -35,13 +34,33 @@ namespace MVVMToolKit.Services
             this._dialogHostDictionary.Add(hostType, targetType);
         }
 
+        private IEnumerable<IDialog> Dialogs => Application.Current.Windows
+                .Cast<Window>()
+                .OfType<IDialog>();
+        public IDialog? GetDialog(string? title)
+        {
+            return Dialogs
+                .FirstOrDefault(popup => popup.Title == title);
+        }
+
+        private IDialog? GetDialog(INotifyPropertyChanged? vm)
+        {
+            return Dialogs.FirstOrDefault(dialog =>
+            {
+                if (dialog.DataContext is IDialogContext context)
+                {
+                    return Equals(context.ViewModel, vm);
+                }
+                return false;
+            });
+        }
         /// <inheritdoc cref="IDialogService"/>
         public bool CheckActivate(string? title)
         {
-            var popup = Application.Current.Windows.Cast<Window>().FirstOrDefault(p => p.Title == title);
-            if (popup is not null)
+            var dialog = GetDialog(title);
+            if (dialog is not null)
             {
-                popup.Activate();
+                dialog.Activate();
                 return true;
             }
 
@@ -58,7 +77,7 @@ namespace MVVMToolKit.Services
         /// <param name="hostType">The host type</param>
         /// <param name="isModal">The is model</param>
         /// <exception cref="Exception">팝업 다이얼로그를 생성할 수 없습니다. IDialog 타입이 맞는지 확인하여 주십시오.</exception>
-        public void Update(ObservableObject viewModel, string? title, double width, double height, string hostType,
+        public void Update(INotifyPropertyChanged viewModel, string? title, double width, double height, string hostType,
             bool isModal = true)
         {
             Update(viewModel, new PopupOption
@@ -76,32 +95,34 @@ namespace MVVMToolKit.Services
         /// <param name="viewModel">The view model</param>
         /// <param name="options"> 팝업 창 설정</param>
         /// <exception cref="Exception">팝업 다이얼로그를 생성할 수 없습니다. IDialog 타입이 맞는지 확인하여 주십시오.</exception>
-        public void Update(ObservableObject viewModel, PopupOption options)
+        public void Update(INotifyPropertyChanged viewModel, PopupOption options)
         {
             if (!this._dialogHostDictionary.TryGetValue(options.HostType, out Type? hostWindowType))
             {
-                throw new Exception("팝업 다이얼로그를 생성할 수 없습니다. IDialog 타입이 맞는지 확인하여 주십시오.");
+                throw new ArgumentException("팝업 다이얼로그를 생성할 수 없습니다. IDialog 타입이 맞는지 확인하여 주십시오.");
             }
             // ContainerProvider를 통해 등록되어 있는 Window를 취득
             var popup = ContainerProvider.Resolve(hostWindowType) as IDialog;
             if (popup is null)
             {
-                throw new Exception("팝업 다이얼로그를 생성할 수 없습니다. IDialog 타입이 맞는지 확인하여 주십시오.");
+                throw new ArgumentException("팝업 다이얼로그를 생성할 수 없습니다. IDialog 타입이 맞는지 확인하여 주십시오.");
+            }
+            if (viewModel is IDialogContext context)
+            {
+                context.Title = options.Title;
             }
 
+            IDialogContext? vm = popup.DataContext as IDialogContext;
             popup.OnClose = () =>
             {
                 popup.OnClose = null;
 
-                if (popup.DataContext is PopupDialogViewModelBase vm)
-                {
-                    vm.Cleanup();
-                }
+                vm?.Cleanup();
 
                 popup.DataContext = null;
             };
 
-            if (popup.DataContext is PopupDialogViewModelBase vm)
+            if (vm != null)
             {
                 popup.Width = options.Width;
                 popup.Height = options.Height;
@@ -122,6 +143,27 @@ namespace MVVMToolKit.Services
             {
                 popup.Show();
             }
+        }
+
+        public void Close(string? title, Action? actionClosing = null)
+        {
+            var dialog = GetDialog(title);
+            Close(dialog, actionClosing);
+
+        }
+        public void Close(IDialog? dialog, Action? actionClosing = null)
+        {
+            if (dialog == null) return;
+
+            actionClosing?.Invoke();
+            dialog.Close();
+
+        }
+        public void Close(INotifyPropertyChanged? vm, Action? actionClosing = null)
+        {
+            var dialog = GetDialog(vm);
+            Close(dialog, actionClosing);
+
         }
         /// <summary>
         /// Clears this instance

@@ -7,10 +7,14 @@ using Microsoft.Extensions.Logging;
 using MVVMToolKit.Helper;
 using MVVMToolKit.Helper.Native;
 using MVVMToolKit.Hosting.Core;
+using MVVMToolKit.Hosting.Extensions;
 using MVVMToolKit.Hosting.Internal;
 using MVVMToolKit.Interfaces;
+using MVVMToolKit.Interfaces.Modules;
+using MVVMToolKit.Interfaces.ViewMapper;
 using MVVMToolKit.Ioc;
 using MVVMToolKit.Services;
+using MVVMToolKit.Utilities;
 
 namespace MVVMToolKit.Hosting
 {
@@ -35,12 +39,22 @@ namespace MVVMToolKit.Hosting
         /// </summary>
         private IDisposableObjectService? disposableService;
 
+        private readonly IModuleCatalog? _moduleCatalog;
+        private readonly IMappingBuilder _builder = new MappingBuilder();
+
         /// <summary>
         /// Initializes a new instance of the <see cref="GenericHostApplication"/> class.
         /// </summary>
         protected GenericHostApplication()
         {
             var builder = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder();
+            SafeFireAndForgetExtensions.SetDefaultExceptionHandling(OnSafeFireAndForgetExceptionHandler);
+            _moduleCatalog = CreateModuleCatalog_Internal();
+            if (_moduleCatalog != null)
+            {
+                InitializeModuleCatalog_Internal(_moduleCatalog);
+            }
+
             Host = builder
                 .UseDefaultServiceProvider(ConfigureServiceProvider)
                 .ConfigureAppConfiguration(ConfigureAppConfiguration)
@@ -53,14 +67,53 @@ namespace MVVMToolKit.Hosting
             Dispatcher.UnhandledExceptionFilter += Dispatcher_UnhandledExceptionFilter;
         }
 
+        private void OnSafeFireAndForgetExceptionHandler(Exception? ex)
+        {
+            Logger?.LogError(ex, $"[SafeFireAndForget]");
+        }
+        private void OnInitializeMapping()
+        {
+            var mappingResources = _builder.Build();
+            Resources.MergedDictionaries.Add(mappingResources);
+
+        }
+        private void OnInitializeModule()
+        {
+            if (_moduleCatalog == null) return;
+            foreach (var module in _moduleCatalog.Modules)
+            {
+                module.Initialize(Host?.Services).SafeFireAndForget();
+            }
+        }
+
+        private IModuleCatalog CreateModuleCatalog_Internal()
+        {
+            return CreateModuleCatalog();
+        }
+        private void InitializeModuleCatalog_Internal(IModuleCatalog moduleCatalog)
+        {
+            InitializeModuleCatalog(moduleCatalog);
+        }
+
+        protected virtual IModuleCatalog CreateModuleCatalog() => new DirectoryModuleCatalog("Modules");
+
+        /// <summary>
+        /// Basic Implement Module Catalog With Assembly
+        /// </summary>
+
+        protected virtual void InitializeModuleCatalog(IModuleCatalog moduleCatalog)
+        {
+        }
+
+
         /// <summary>
         /// Describes whether this instance check duplicate process.
         /// </summary>
         /// <returns>The result.</returns>
-        protected bool CheckDuplicateProcess(string appName = "", string appTitle = "")
+        private bool CheckDuplicateProcess(string appName = "", string appTitle = "")
         {
             bool result = false;
-            if (ProcessHelper.Do(appName))
+            if (ProcessHelper.IsRunningProcess(appName))
             {
                 result = true;
 
@@ -95,6 +148,17 @@ namespace MVVMToolKit.Hosting
             return result;
         }
 
+
+        protected GenericHostApplication AddMapping<TViewModel>(IViewConfiguration configuration)
+        {
+            _builder.AddMapping<TViewModel>(configuration);
+            return this;
+        }
+        protected GenericHostApplication AddMapping(Uri uri)
+        {
+            _builder.AddMapping(uri);
+            return this;
+        }
         /// <summary>
         /// Ons the startup using the specified e.
         /// </summary>
@@ -111,8 +175,13 @@ namespace MVVMToolKit.Hosting
                 Current.Shutdown(0);
             }
 
+            OnInitializeModule();
+            OnInitializeMapping();
+
             base.OnStartup(e);
         }
+
+
 
         /// <summary>
         /// Ons the exit using the specified e.
@@ -169,13 +238,27 @@ namespace MVVMToolKit.Hosting
                     .AddConsole()
                     .AddJsonConsole();
             });
+
+            services.AddSingleton<IDispatcherService, DispatcherService>().AllowLazy();
             services.AddSingleton<IDisposableObjectService, DisposableObjectService>();
 
             services.AddSingleton<IDialogService, DialogService>();
+            foreach (var module in _moduleCatalog.Modules)
+            {
+                module.ConfigureServices(services);
+            }
             InitializeServices(services);
             InitializeViewModels(services);
             InitializeViews(services);
+
+            foreach (var module in _moduleCatalog.Modules)
+            {
+                module.ConfigureMappings(_builder);
+            }
+
+            InitializeMappings(_builder);
         }
+
 
         /// <summary>
         /// Initializes the services using the specified services.
@@ -201,6 +284,9 @@ namespace MVVMToolKit.Hosting
         {
         }
 
+        protected virtual void InitializeMappings(IMappingBuilder builder)
+        {
+        }
         /// <summary>
         /// Dispatchers the unhandled exception filter using the specified sender.
         /// </summary>

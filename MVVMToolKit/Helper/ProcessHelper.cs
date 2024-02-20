@@ -20,7 +20,7 @@ namespace MVVMToolKit.Helper
     /// <returns>
     /// 실행중 = true / 실행중인 프로세스 없음 = false.
     /// </returns>
-    public static bool Do(string processName)
+    public static bool IsRunningProcess(string processName)
     {
         try
         {

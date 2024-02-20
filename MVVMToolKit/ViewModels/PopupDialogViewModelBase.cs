@@ -1,26 +1,31 @@
+using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
+using MVVMToolKit.Interfaces;
+using MVVMToolKit.Ioc;
 
 namespace MVVMToolKit.ViewModels
 {
     /// <summary>
     /// 팝업 다이얼로그를 위한 ViewModel.
     /// </summary>
-    public partial class PopupDialogViewModelBase : ObservableObject
+    public abstract partial class PopupDialogViewModelBase : ObservableObject, IDialogContext
     {
         /// <summary>
         /// The view model.
         /// </summary>
-        [ObservableProperty] private ObservableObject? _viewModel;
+        [ObservableProperty] private INotifyPropertyChanged? _viewModel;
 
+        [ObservableProperty] private string? _title;
         /// <summary>
         /// Closes this instance.
         /// </summary>
         [RelayCommand]
-        private void Close()
+        public void Close()
         {
             this.ViewModel = null;
+
         }
 
         /// <summary>
@@ -28,7 +33,23 @@ namespace MVVMToolKit.ViewModels
         /// </summary>
         public virtual void Cleanup()
         {
+            Close();
             WeakReferenceMessenger.Default.Cleanup();
+        }
+
+
+        [RelayCommand]
+        private void TitleBarMouseMove(MouseEventArgs args)
+        {
+            if (args is { Source: FrameworkElement control, LeftButton: MouseButtonState.Pressed })
+            {
+                var dispatcherService = ContainerProvider.Resolve<IDispatcherService>();
+                dispatcherService?.Invoke(() =>
+                {
+                    var window = Window.GetWindow(control);
+                    window?.DragMove();
+                });
+            }
         }
     }
 }

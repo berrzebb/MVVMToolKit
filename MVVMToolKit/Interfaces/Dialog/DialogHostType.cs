@@ -1,4 +1,4 @@
-namespace MVVMToolKit.Enums.Dialog
+namespace MVVMToolKit.Interfaces
 {
     /// <summary>
     /// 다이얼로그 호스트의 타입을 나타내는 열거형입니다.<br/>

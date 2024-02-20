@@ -6,7 +6,8 @@ namespace MVVMToolKit.Hosting.Internal
     /// The disposable object service class
     /// </summary>
     /// <seealso cref="IDisposableObjectService"/>
-    public class DisposableObjectService : IDisposableObjectService    {
+    public sealed class DisposableObjectService : IDisposableObjectService
+    {
         /// <summary>
         /// The disposable
         /// </summary>
@@ -63,7 +64,7 @@ namespace MVVMToolKit.Hosting.Internal
         /// Disposes the disposing
         /// </summary>
         /// <param name="disposing">The disposing</param>
-        protected virtual void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
             if (!this.disposedValue)
             {
@@ -80,11 +81,11 @@ namespace MVVMToolKit.Hosting.Internal
         }
 
         // // TODO: 비관리형 리소스를 해제하는 코드가 'Dispose(bool disposing)'에 포함된 경우에만 종료자를 재정의합니다.
-         ~DisposableObjectService()
-         {
+        ~DisposableObjectService()
+        {
             // 이 코드를 변경하지 마세요. 'Dispose(bool disposing)' 메서드에 정리 코드를 입력합니다.
             this.Dispose(disposing: false);
-         }
+        }
 
         /// <summary>
         /// Disposes this instance

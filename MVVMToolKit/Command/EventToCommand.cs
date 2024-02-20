@@ -14,7 +14,7 @@ namespace MVVMToolKit.Command
         /// <see cref="Command" /> 종속성 속성을 식별합니다.
         /// </summary>
         public static readonly DependencyProperty CommandProperty = DependencyProperty.Register(
-            nameof(ICommand),
+            nameof(Command),
             typeof(ICommand),
             typeof(EventToCommand),
             new PropertyMetadata(

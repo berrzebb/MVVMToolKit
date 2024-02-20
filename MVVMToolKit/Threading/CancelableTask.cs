@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -8,128 +7,132 @@ namespace MVVMToolKit.Threading
     /// The cancelable task class
     /// </summary>
     /// <seealso cref="IDisposable"/>
-    public class CancelableTask : IDisposable
+    public class CancelableTask : ICancelableTask
     {
-        /// <summary>
-        /// The token source.
-        /// </summary>
-        private CancellationTokenSource tokenSource;
+        private readonly bool _allowConcurrency;
+        private Operation? _activeOperation;
 
-        /// <summary>
-        /// The token.
-        /// </summary>
-        private CancellationToken token;
+        private sealed class Operation : IDisposable
+        {
+            private readonly CancellationTokenSource _cancellationTokenSource;
+#if NET6_0_OR_GREATER
+            private readonly TaskCompletionSource _completionSource;
+#else
+            private readonly TaskCompletionSource<object?> _completionSource;
+#endif
+            private bool _disposed;
 
-        /// <summary>
-        /// The task.
-        /// </summary>
-        private Task? task;
-        
-        /// <summary>
-        /// The disposed value.
-        /// </summary>
-        private bool disposedValue;
+            private readonly object SyncRoot = new();
+
+            public Task Completion => _completionSource.Task;
+
+            public Operation(CancellationTokenSource? cancellationTokenSource = null)
+            {
+                _cancellationTokenSource = cancellationTokenSource ?? new CancellationTokenSource();
+#if NET6_0_OR_GREATER
+                _completionSource = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+#else
+                _completionSource = new TaskCompletionSource<object?>(TaskCreationOptions.RunContinuationsAsynchronously);
+
+#endif
+            }
+
+            public void Cancel()
+            {
+                lock (SyncRoot)
+                {
+                    if (!_disposed) _cancellationTokenSource.Cancel();
+                }
+            }
+
+            public void Dispose()
+            {
+                try
+                {
+                    lock (SyncRoot)
+                    {
+                        _cancellationTokenSource.Dispose();
+                        _disposed = true;
+                    }
+                }
+                finally
+                {
+#if NET6_0_OR_GREATER
+                    _completionSource.SetResult();
+#else
+                    _completionSource.SetResult(null);
+#endif
+                }
+            }
+        }
+
+        public bool IsRunning => Volatile.Read(ref _activeOperation) != null;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CancelableTask"/> class.
         /// </summary>
-        public CancelableTask()
+        private CancelableTask(bool allowConcurrency)
         {
-            this.tokenSource = new CancellationTokenSource();
-            this.token = this.tokenSource.Token;
+            this._allowConcurrency = allowConcurrency;
         }
-        
-        /// <summary>
-        /// Release CancelableTask.
-        /// </summary>
-        ~CancelableTask()
+
+        public async Task<TResult> RunAsync<TResult>(
+            Func<CancellationToken, Task<TResult>>? action,
+            CancellationToken token = default)
         {
-            this.Dispose(true);
-        }
-        
-        /// <summary>
-        /// Gets the value of the is completed.
-        /// </summary>
-        public bool? IsCompleted => this.task?.IsCompleted;
-        
-        /// <summary>
-        /// Resets this instance.
-        /// </summary>
-        public void Reset()
-        {
-            this.Cancel();
-            this.tokenSource = new CancellationTokenSource();
-            this.token = this.tokenSource.Token;
-        }
-        /// <summary>
-        /// Runs the request task.
-        /// </summary>
-        /// <param name="requestTask">The request task</param>
-        public async Task Run(Action<CancellationToken> requestTask)
-        {
+#if NET6_0_OR_GREATER
+            ArgumentNullException.ThrowIfNull(action);
+#endif
+            CancellationTokenSource cancellationTokenSource = CancellationTokenSource
+                .CreateLinkedTokenSource(token);
+            using Operation? operation = new(cancellationTokenSource);
+
+            Operation? oldOperation = Interlocked.Exchange(ref _activeOperation, operation);
+
             try
             {
-                this.task = Task.Run(
-                    () => requestTask.Invoke(this.token), 
-                    this.token);
-                await this.task;
-            } catch (TaskCanceledException ex)
-            {
-                Debug.WriteLine($"Task Execution Cancelled: {ex.Message}");
-
-            }
-            
-        }
-        
-        /// <summary>
-        /// Cancels this instance.
-        /// </summary>
-        public void Cancel()
-        {
-            try
-            {
-                this.tokenSource.Cancel();
-                // this.token.ThrowIfCancellationRequested();
-            }
-            catch (OperationCanceledException ex)
-            {
-                Debug.WriteLine($"Task Execution Cancelled: {ex.Message}");
-            }
-            catch (ObjectDisposedException ex)
-            {
-                Debug.WriteLine($"Task Execution Cancelled: {ex.Message}");
-            }
-
-        }
-
-    /// <summary>
-    /// Disposes the disposing,
-    /// </summary>
-    /// <param name="disposing">The disposing,</param>
-    protected virtual void Dispose(bool disposing)
-        {
-            if (!this.disposedValue)
-            {
-                if (disposing)
+                if (oldOperation is not null && !_allowConcurrency)
                 {
-                    // TODO: 관리형 상태(관리형 개체)를 삭제합니다.
-                    this.Cancel();
+                    oldOperation.Cancel();
+                    await oldOperation.Completion; // Continue on captured context
                 }
 
-                // TODO: 비관리형 리소스(비관리형 개체)를 해제하고 종료자를 재정의합니다.
-                // TODO: 큰 필드를 null로 설정합니다.
-                this.disposedValue = true;
+                cancellationTokenSource.Token.ThrowIfCancellationRequested();
+                Task<TResult> task = action(cancellationTokenSource.Token);
+                return await task.ConfigureAwait(false);
+            }
+            finally
+            {
+                Interlocked.CompareExchange(ref _activeOperation, null, operation);
             }
         }
 
-    /// <summary>
-    /// Disposes this instance,
-    /// </summary>
-    public void Dispose()
+        public Task RunAsync(Func<CancellationToken, Task> action,
+            CancellationToken token = default)
         {
-            // 이 코드를 변경하지 마세요. 'Dispose(bool disposing)' 메서드에 정리 코드를 입력합니다.
-            this.Dispose(disposing: true);
-            GC.SuppressFinalize(this);
+#if NET6_0_OR_GREATER
+            ArgumentNullException.ThrowIfNull(action);
+#endif
+
+            return RunAsync<object?>(async ct =>
+            {
+                await action(ct).ConfigureAwait(false);
+                return null;
+            }, token);
         }
+
+        public Task CancelAsync()
+        {
+            Operation? operation = Volatile.Read(ref _activeOperation);
+
+            if (operation is null) return Task.CompletedTask;
+
+            operation.Cancel();
+            return operation.Completion;
+        }
+
+        public bool Cancel() => CancelAsync().IsCompleted == false;
+
+        public ICancelableTask Create(bool allowConcurrency = false) => new CancelableTask(allowConcurrency);
     }
 }

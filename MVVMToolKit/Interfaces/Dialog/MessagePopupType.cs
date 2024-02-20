@@ -1,4 +1,4 @@
-namespace MVVMToolKit.Enums.Dialog
+namespace MVVMToolKit.Interfaces
 {
     /// <summary>
     /// 메시지 팝업의 유형을 나타내는 열거형입니다.<br/>
