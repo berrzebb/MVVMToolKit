@@ -1,38 +1,45 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0-windows</TargetFramework>
-    <Nullable>enable</Nullable>
-    <UseWPF>true</UseWPF>
-    <Platforms>AnyCPU;x64;x86</Platforms>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
-    <Company>ENDCS</Company>
-    <Authors>Hyun Park</Authors>
-    <PackageOutputPath>$(SolutionDir)\nuget\$(Platform)\$(Configuration)</PackageOutputPath>
-    <GenerateDocumentationFile>False</GenerateDocumentationFile>
-    <AssemblyVersion>1.0.0</AssemblyVersion>
-    <FileVersion>1.0.0</FileVersion>
-    <Version>$([System.DateTime]::Now.ToString("yyyy.MM.dd.HHmmss"))</Version>
-    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
-    <IsPublishable>False</IsPublishable>
-    <Description>MVVM Tool Kit</Description>
-    <PackageProjectUrl>https://gitlab.endcs.net/development/MVVMToolKit</PackageProjectUrl>
-    <RepositoryUrl>https://gitlab.endcs.net/development/MVVMToolKit</RepositoryUrl>
-    <PackAsTool>False</PackAsTool>
+	<TargetFrameworks>net481;net5.0-windows;net6.0-windows;</TargetFrameworks>
+	<Nullable>enable</Nullable>
+	  <LangVersion>10</LangVersion>
+	<UseWPF>true</UseWPF>
+	<Platforms>AnyCPU;x64;x86</Platforms>
+	<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+	<EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+	<Company>ENDCS</Company>
+	<Authors>Hyun Park</Authors>
+	<PackageOutputPath>$(SolutionDir)\nuget\$(Platform)\$(Configuration)</PackageOutputPath>
+	<GenerateDocumentationFile>False</GenerateDocumentationFile>
+	<AssemblyVersion>1.0.0</AssemblyVersion>
+	<FileVersion>1.0.0</FileVersion>
+	<Version>$([System.DateTime]::Now.ToString("yyyy.MM.dd.HHmmss"))</Version>
+	<RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+	<IsPublishable>False</IsPublishable>
+	<Description>MVVM Tool Kit</Description>
+	<PackageProjectUrl>https://gitlab.endcs.net/development/MVVMToolKit</PackageProjectUrl>
+	<RepositoryUrl>https://gitlab.endcs.net/development/MVVMToolKit</RepositoryUrl>
+	<PackAsTool>False</PackAsTool>
+	  <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
+	<IncludeSymbols>True</IncludeSymbols>
+	<SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.1.0" />
-    <PackageReference Include="Grace" Version="7.2.1" />
-    <PackageReference Include="Grace.AspNetCore.Hosting" Version="7.1.0" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.0" />
-    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
+	<PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+	<PackageReference Include="Microsoft.Extensions.Configuration.Ini" Version="8.0.0" />
+	<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+	<PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
+	<PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Templates\" />
-    <Folder Include="Properties\" />
+	<Folder Include="Behaviors\ViewCache\" />
+	<Folder Include="Properties\" />
   </ItemGroup>
 
+	<ItemGroup>
+		<FrameworkReference Update="Microsoft.WindowsDesktop.App;Microsoft.NETCore.App;Microsoft.WindowsDesktop.App.WPF;Microsoft.WindowsDesktop.App.WindowsForms" TargetingPackVersion="6.0.0" />
+	</ItemGroup>
 </Project>
