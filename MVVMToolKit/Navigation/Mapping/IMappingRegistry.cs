@@ -4,8 +4,4 @@
     {
         IMappingRegistry Register(IMappingConfiguration configuration);
     }
-    internal interface IMappingBuilder
-    {
-        ResourceDictionary Build();
-    }
 }

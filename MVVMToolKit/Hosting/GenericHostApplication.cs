@@ -19,6 +19,9 @@ using MVVMToolKit.Utilities;
 namespace MVVMToolKit.Hosting
 {
     using Ioc.Modules;
+    using MVVMToolKit.Navigation.Mapping.Internals;
+    using MVVMToolKit.Navigation.Zones;
+    using Navigation.Views;
 
     /// <summary>
     /// The generic host application class.
@@ -42,7 +45,7 @@ namespace MVVMToolKit.Hosting
         private IDisposableObjectService? _disposableService;
 
         private readonly IModuleCatalog? _moduleCatalog;
-        private readonly IMappingRegistry _mappingRegistry = new MappingBuilder();
+        private readonly IMappingRegistry _mappingRegistry = new MappingManager();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GenericHostApplication"/> class.
@@ -225,6 +228,9 @@ namespace MVVMToolKit.Hosting
             services.AddSingleton<IDisposableObjectService, DisposableObjectService>();
 
             services.AddSingleton<IDialogService, DialogService>();
+            services.AddSingleton<IZoneRegistry, ZoneRegistry>();
+            services.AddSingleton((IRouteRegistry)_mappingRegistry);
+            services.AddSingleton<IViewNavigator, ViewNavigator>();
 
             IEnumerable<IModule> currentModules = this._moduleCatalog?.Modules.ToArray() ?? Array.Empty<IModule>();
             foreach (IModule module in currentModules)

@@ -18,7 +18,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\MVVMToolKit\MVVMToolKit.csproj" />
     <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
     <ProjectReference Include="..\ProtoTypeModule\ProtoTypeModule.csproj" />
   </ItemGroup>

@@ -1,22 +1,50 @@
 ﻿namespace MVVMToolKit.Navigation.Zones
 {
+    using System.Collections.Concurrent;
+    using System.Diagnostics;
     using System.Windows;
 
-    public class ZoneRegistry
+    public interface IZoneRegistry
     {
-        public static readonly DependencyProperty ZoneNameProperty = DependencyProperty.RegisterAttached("ZoneName", typeof(string), typeof(ZoneRegistry), new PropertyMetadata(defaultValue: null, propertyChangedCallback: OnSetZoneName));
-        public static void SetZoneName(FrameworkElement target, object value) =>
-            target.SetValue(ZoneNameProperty, value);
+        DependencyObject? this[string zoneName] { get; }
+    }
 
+    public class ZoneRegistry : IZoneRegistry
+    {
+        private static readonly ConcurrentDictionary<string, DependencyObject> Zones = new();
+        public static readonly DependencyProperty ZoneNameProperty = DependencyProperty.RegisterAttached("ZoneName", typeof(string), typeof(ZoneRegistry), new PropertyMetadata(defaultValue: null, propertyChangedCallback: OnZoneNameChanged));
+
+        DependencyObject? IZoneRegistry.this[string zoneName] => Zones.TryGetValue(zoneName, out DependencyObject? zone) ? zone : null;
+
+        public static void SetZoneName(DependencyObject target, object value)
+        {
+            Debug.Assert(target != null);
+
+            target.SetValue(ZoneNameProperty, value);
+        }
         public static string? GetZoneName(DependencyObject target)
         {
-            if (target == null) throw new ArgumentNullException(nameof(target));
+            Debug.Assert(target != null);
+
             return target.GetValue(ZoneNameProperty) as string;
         }
-        private static void OnSetZoneName(DependencyObject element, DependencyPropertyChangedEventArgs args)
+        private static bool IsInDesignMode(DependencyObject element)
         {
-            /// TODO
-            /// 
+#if HAS_WINUI
+            return Windows.ApplicationModel.DesignMode.DesignModeEnabled;
+#else
+            return DesignerProperties.GetIsInDesignMode(element);
+#endif
         }
+        private static void OnZoneNameChanged(DependencyObject element, DependencyPropertyChangedEventArgs args)
+        {
+            if (IsInDesignMode(element)) return;
+            string? zoneName = GetZoneName(element);
+
+            if (string.IsNullOrEmpty(zoneName)) return;
+
+            Zones.TryAdd(zoneName, element);
+        }
+
     }
 }

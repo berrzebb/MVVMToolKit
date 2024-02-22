@@ -1,6 +1,7 @@
 ﻿namespace MVVMToolKit.Templates
 {
     using System.Windows.Controls;
+    using MVVMToolKit.Interfaces;
     using MVVMToolKit.Ioc;
     using MVVMToolKit.Navigation.Mapping;
 
@@ -42,7 +43,6 @@
 
         /// <summary>
         /// 입력받은 viewName에 대하여 View를 생성하여 반환합니다.
-        /// 이때 
         /// </summary>
         /// <param name="owner">view를 사용하는 주체.</param>
         /// <param name="cacheMode">View를 생성하는 방법.</param>
@@ -84,11 +84,7 @@
             propertyType: typeof(ViewCacheMode),
             ownerType: typeof(ViewProxy),
             new PropertyMetadata(ViewCacheMode.DependencyInjection, OnViewChanged));
-        public static readonly DependencyProperty ViewSelectorProperty = DependencyProperty.Register(
-            name: nameof(ViewSelector),
-            propertyType: typeof(Func<INotifyPropertyChanged, string>),
-            ownerType: typeof(ViewProxy),
-            new PropertyMetadata(null, OnViewChanged));
+
         public static readonly DependencyProperty ViewModeProperty = DependencyProperty.Register(
             name: nameof(ViewMode),
             propertyType: typeof(ViewMode),
@@ -106,18 +102,9 @@
         private void UpdateView()
         {
             var targetViewType = this.ViewType;
-            if (this.ViewMode == ViewMode.Selector)
+            if (this.ViewMode == ViewMode.Selector && this.DataContext is IViewSelector viewSelector)
             {
-                if (this.DataContext is not INotifyPropertyChanged viewModel) return;
-
-                if (this.ViewSelector != null)
-                {
-                    targetViewType = this.ViewSelector?.Invoke(viewModel);
-                }
-                else if (viewModel is IViewSelector viewSelector)
-                {
-                    targetViewType = viewSelector.GetView();
-                }
+                targetViewType = viewSelector.NavigateTo();
             }
 
             if (targetViewType == this.CurrentView) return;
@@ -140,11 +127,6 @@
         {
             get => (ViewMode)this.GetValue(ViewModeProperty);
             set => this.SetValue(ViewModeProperty, value);
-        }
-        public Func<INotifyPropertyChanged, string>? ViewSelector
-        {
-            get => (Func<INotifyPropertyChanged, string>?)this.GetValue(ViewSelectorProperty);
-            set => this.SetValue(ViewSelectorProperty, value);
         }
         public ViewProxy()
         {
@@ -176,8 +158,9 @@
             {
                 propertyChanged.PropertyChanged -= this.PropertyChangedOnPropertyChanged;
             }
-            this.Unloaded -= this.OnUnloaded;
             this.Content = null;
+            this.CurrentView = null;
+            this.Unloaded -= this.OnUnloaded;
         }
     }
 }
