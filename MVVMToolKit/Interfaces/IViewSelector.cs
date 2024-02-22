@@ -1,7 +1,7 @@
-﻿namespace MVVMToolKit.Navigation.Mapping
+﻿namespace MVVMToolKit.Interfaces
 {
     public interface IViewSelector : INotifyPropertyChanged
     {
-        string GetView();
+        string NavigateTo();
     }
 }

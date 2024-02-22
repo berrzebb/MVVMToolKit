@@ -2,29 +2,32 @@
 
 namespace MVVMToolKit.Navigation.Mapping
 {
+    using System.Collections.Generic;
+    using Internals;
     using Templates;
 
-    internal class MappingBuilder : IMappingRegistry, IMappingBuilder
+    internal class MappingManager : IMappingRegistry, IMappingBuilder, IRouteRegistry
     {
 
         private readonly ConcurrentDictionary<object, IMappingConfiguration> _mappings = new();
+        private readonly ConcurrentDictionary<DataTemplateKey, DataTemplate?> _routes = new();
 
+        public DataTemplate? this[DataTemplateKey routeKey] => _routes.TryGetValue(routeKey, out DataTemplate? route) ? route : null;
 
         public IMappingRegistry Register(IMappingConfiguration configuration)
         {
             object? key = string.IsNullOrEmpty(configuration.RouteName) ? configuration.ContextType : configuration.RouteName;
-            if (key == null) throw new ArgumentException($"[MappingBuilder] Mapping 의 key가 될 수 있는 RouteName이나 ContextType이 존재하지 않습니다. 확인해 주십시오.", nameof(configuration));
+            if (key == null) throw new ArgumentException($"[MappingManager] Mapping 의 key가 될 수 있는 RouteName이나 ContextType이 존재하지 않습니다. 확인해 주십시오.", nameof(configuration));
             _mappings.GetOrAdd(key, configuration);
             return this;
         }
 
-        private DataTemplate? CreateFromConfiguration(IMappingConfiguration configuration)
+        private static DataTemplate? CreateFromConfiguration(IMappingConfiguration configuration)
         {
             FrameworkElementFactory viewProxyFactory = new(typeof(ViewProxy));
             viewProxyFactory.SetValue(ViewProxy.ViewTypeProperty, configuration.ViewType);
             viewProxyFactory.SetValue(ViewProxy.ViewModeProperty, configuration.ViewMode);
             viewProxyFactory.SetValue(ViewProxy.ViewCacheModeProperty, configuration.CacheMode);
-            viewProxyFactory.SetValue(ViewProxy.ViewSelectorProperty, configuration.ViewSelector);
             DataTemplate? dataTemplate = null;
             if (configuration.ContextType == null)
             {
@@ -46,14 +49,17 @@ namespace MVVMToolKit.Navigation.Mapping
 
         ResourceDictionary IMappingBuilder.Build()
         {
-            ResourceDictionary resources = new();
+            ResourceDictionary resourceDictionary = new();
 
             foreach (KeyValuePair<object, IMappingConfiguration> mapping in _mappings)
             {
-                resources.Add(new DataTemplateKey(mapping.Key), CreateFromConfiguration(mapping.Value));
+                DataTemplateKey routeKey = new DataTemplateKey(mapping.Key);
+                DataTemplate? dataTemplate = CreateFromConfiguration(mapping.Value);
+                resourceDictionary.Add(routeKey, dataTemplate);
+                _routes.TryAdd(routeKey, dataTemplate);
             }
 
-            return resources;
+            return resourceDictionary;
         }
     }
 }

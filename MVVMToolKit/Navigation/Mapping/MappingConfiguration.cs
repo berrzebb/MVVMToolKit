@@ -23,19 +23,13 @@
 
 
         public ViewCacheMode CacheMode { get; set; } = ViewCacheMode.DependencyInjection;
-        public Func<INotifyPropertyChanged, string?>? ViewSelector { get; set; } = null;
 
     }
-    public class MappingConfiguration<TViewModel> : MappingConfiguration, IMappingConfiguration<TViewModel>
+    public class MappingConfiguration<TViewModel> : MappingConfiguration
     where TViewModel : INotifyPropertyChanged
     {
 
         public MappingConfiguration() => ContextType = typeof(TViewModel);
-
-        /// <inheritdoc />
-        Func<INotifyPropertyChanged, string?>? IMappingConfiguration.ViewSelector => ViewSelector == null ? null : v => ViewSelector.Invoke((TViewModel)v);
-        public Func<TViewModel, string?>? ViewSelector { get; set; } = null;
-
     }
 
 }

@@ -29,15 +29,20 @@ namespace WithModuleSample
         protected override void InitializeViewModels(IServiceCollection services)
         {
             base.InitializeViewModels(services);
-            services.AddViewModel<MainWindowModel>();
+            services.AddViewModel<SwitchViewModel>();
+            services.AddViewModel<RegionableViewModel>();
+
         }
         protected override void InitializeViews(IServiceCollection services)
         {
             base.InitializeViews(services);
             services.AddView<MainShell>();
-            services.AddView<FirstView>(ServiceLifetime.Singleton);
+            services.AddView<FirstView>();
             services.AddView<SecondaryView>();
             services.AddView<ThirdView>();
+            services.AddView<RegionableView>();
+
+            services.AddView<InjectedView>();
         }
 
         /// <inheritdoc />
@@ -45,39 +50,28 @@ namespace WithModuleSample
         {
             base.InitializeMappings(registry);
 
-            // Method A View Selector Func
-            //registry.AddMapping(new ViewConfiguration<MainWindowModel>()
-            //{
-            //    ViewMode = ViewMode.Selector,
-            //    ViewSelector = vm =>
-            //    {
-            //        if (vm is MainWindowModel mvm)
-            //        {
-            //            switch (mvm.Selector)
-            //            {
-            //                case 0: return nameof(FirstView);
-            //                case 1: return nameof(SecondaryView);
-            //                default: return nameof(FirstView);
-            //            }
-            //        }
-
-            //        return nameof(FirstView);
-            //    },
-            //    CacheMode = ViewCacheMode.DependencyInjection,
-            //    ViewType = nameof(FirstView),
-            //});
-            // Method B View Selector Use Interface
-            registry.Register(new MappingConfiguration<MainWindowModel>()
+            registry.Register(new MappingConfiguration()
+            {
+                RouteName = "Single",
+                ViewMode = ViewMode.Single,
+                ViewType = nameof(ThirdView)
+            });
+            registry.Register(new MappingConfiguration<SwitchViewModel>()
             {
                 ViewMode = ViewMode.Selector
             });
-            // Method C Single View
-            //registry.Register(new MappingConfiguration<MainWindowModel>()
-            //{
-            //    ViewType = nameof(ThirdView),
-            //    CacheMode = ViewCacheMode.DependencyInjection
-            //});
-
+            registry.Register(new MappingConfiguration<RegionableViewModel>()
+            {
+                RouteName = "Injection",
+                ViewMode = ViewMode.Single,
+                ViewType = nameof(RegionableView)
+            });
+            registry.Register(new MappingConfiguration()
+            {
+                RouteName = "Golden",
+                ViewMode = ViewMode.Single,
+                ViewType = nameof(InjectedView)
+            });
 
         }
 
@@ -86,12 +80,16 @@ namespace WithModuleSample
         {
             base.OnStartup(e);
             var proto = ContainerProvider.Resolve<IPrototypeInterface>();
+            var viewNavigator = ContainerProvider.Resolve<IViewNavigator>();
 
             proto.Print();
             MainWindow = ContainerProvider.Resolve<MainShell>();
-
-            MainWindow.Content = ContainerProvider.Resolve<MainWindowModel>();
             MainWindow.Show();
+
+            viewNavigator.Navigate("SingleViewZone", "Single");
+            viewNavigator.Navigate("SwitchableViewZone", typeof(SwitchViewModel));
+            viewNavigator.Navigate("InjectableViewZone", "Injection", typeof(RegionableViewModel));
+
         }
     }
 

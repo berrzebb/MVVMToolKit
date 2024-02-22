@@ -13,7 +13,7 @@ namespace ProtoTypeModule
         {
         }
 
-        public Task Initialize(IServiceProvider provider)
+        public Task Initialize(IServiceProvider? provider)
         {
             MessageBox.Show("Initlaize Proto");
             return Task.CompletedTask;
