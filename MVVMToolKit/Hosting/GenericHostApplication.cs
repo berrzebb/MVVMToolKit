@@ -200,6 +200,7 @@ namespace MVVMToolKit.Hosting
         {
             _disposableService?.Dispose();
             await Host!.StopAsync();
+            Host.Dispose();
             base.OnExit(e);
         }
 
