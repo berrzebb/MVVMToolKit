@@ -32,10 +32,10 @@ namespace MVVMToolKit.Converters
 
             if (parameter != null && parameter.ToString()!.Equals(strEnum))
             {
-                return this.TrueValue;
+                return TrueValue;
             }
 
-            return this.FalseValue;
+            return FalseValue;
         }
 
         /// <summary>

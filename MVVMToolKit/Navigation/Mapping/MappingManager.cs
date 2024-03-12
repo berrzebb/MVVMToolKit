@@ -53,7 +53,7 @@ namespace MVVMToolKit.Navigation.Mapping
 
             foreach (KeyValuePair<object, IMappingConfiguration> mapping in _mappings)
             {
-                DataTemplateKey routeKey = new DataTemplateKey(mapping.Key);
+                DataTemplateKey routeKey = new(mapping.Key);
                 DataTemplate? dataTemplate = CreateFromConfiguration(mapping.Value);
                 resourceDictionary.Add(routeKey, dataTemplate);
                 _routes.TryAdd(routeKey, dataTemplate);

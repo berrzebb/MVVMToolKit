@@ -8,7 +8,7 @@
         public static DateTime UnixTime2DateTime(int timestamp)
         {
             var dTimestamp = Convert.ToDouble(timestamp);
-            return TimeHelper.UnixTime2DateTime(dTimestamp);
+            return UnixTime2DateTime(dTimestamp);
         }
 
         public static DateTime UnixTime2DateTime(double timestamp) => UnixOrigin.AddSeconds(timestamp).ToLocalTime();

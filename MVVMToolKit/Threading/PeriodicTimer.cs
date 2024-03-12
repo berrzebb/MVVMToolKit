@@ -20,7 +20,7 @@ namespace MVVMToolKit.Threading
             }
 
             _state = new State();
-            _timer = new Timer(s => ((State)s!).Signal(), _state, (uint)ms, (uint)ms);
+            _timer = new Timer(s => ((State)s!).Signal(false), _state, (uint)ms, (uint)ms);
 
         }
 
@@ -37,7 +37,7 @@ namespace MVVMToolKit.Threading
         ~PeriodicTimer() => Dispose();
         private sealed class State : IValueTaskSource<bool>
         {
-            private PeriodicTimer? _owner;
+            public PeriodicTimer? Owner;
 
             private ManualResetValueTaskSourceCore<bool> _manualResetValueTaskSourceCore;
 
@@ -73,21 +73,23 @@ namespace MVVMToolKit.Threading
                     }
                     Debug.Assert(!_stopped, "Unexpectedly stopped without _signaled being true.");
 
-                    _owner = owner;
+                    Owner = owner;
                     _activeWait = true;
                     _ctr = cancellationToken.Register(v =>
                     {
                         if (v is KeyValuePair<State, CancellationToken> kv)
                         {
-                            kv.Key.Signal(cancellationToken: kv.Value);
+                            kv.Key.Signal(false, cancellationToken: kv.Value);
                         }
                     }, new KeyValuePair<State, CancellationToken>(this, cancellationToken));
 
-                    return new ValueTask<bool>(this, this._manualResetValueTaskSourceCore.Version);
+                    return new ValueTask<bool>(this, _manualResetValueTaskSourceCore.Version);
                 }
             }
 
-            public void Signal(bool stopping = false, CancellationToken cancellationToken = default(CancellationToken))
+            public void Signal(bool stopping) => Signal(stopping, cancellationToken: default);
+
+            public void Signal(bool stopping, CancellationToken cancellationToken)
             {
                 bool completeTask = false;
 
@@ -106,12 +108,12 @@ namespace MVVMToolKit.Threading
                 {
                     if (cancellationToken.IsCancellationRequested)
                     {
-                        this._manualResetValueTaskSourceCore.SetException(new OperationCanceledException(cancellationToken));
+                        _manualResetValueTaskSourceCore.SetException(new OperationCanceledException(cancellationToken));
                     }
                     else
                     {
                         Debug.Assert(!Monitor.IsEntered(this));
-                        this._manualResetValueTaskSourceCore.SetResult(true);
+                        _manualResetValueTaskSourceCore.SetResult(true);
                     }
                 }
             }
@@ -123,14 +125,14 @@ namespace MVVMToolKit.Threading
                 {
                     try
                     {
-                        this._manualResetValueTaskSourceCore.GetResult(token);
+                        _manualResetValueTaskSourceCore.GetResult(token);
                     }
                     finally
                     {
-                        this._manualResetValueTaskSourceCore.Reset();
+                        _manualResetValueTaskSourceCore.Reset();
                         _ctr = default;
                         _activeWait = false;
-                        _owner = null;
+                        Owner = null;
                         if (!_stopped)
                         {
                             _signaled = false;
@@ -141,10 +143,10 @@ namespace MVVMToolKit.Threading
                 }
             }
 
-            ValueTaskSourceStatus IValueTaskSource<bool>.GetStatus(short token) => this._manualResetValueTaskSourceCore.GetStatus(token);
+            ValueTaskSourceStatus IValueTaskSource<bool>.GetStatus(short token) => _manualResetValueTaskSourceCore.GetStatus(token);
 
             void IValueTaskSource<bool>.OnCompleted(Action<object?> continuation, object? state, short token, ValueTaskSourceOnCompletedFlags flags) =>
-                this._manualResetValueTaskSourceCore.OnCompleted(continuation, state, token, flags);
+                _manualResetValueTaskSourceCore.OnCompleted(continuation, state, token, flags);
         }
     }
 }

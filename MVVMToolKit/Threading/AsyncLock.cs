@@ -19,13 +19,13 @@ namespace MVVMToolKit.Threading
         /// <param name="maxCount">The max count</param>
         public AsyncLock(int initialCount, int maxCount)
         {
-            this.semaphore = new SemaphoreSlim(initialCount, maxCount);
+            semaphore = new SemaphoreSlim(initialCount, maxCount);
         }
         /// <summary>
         /// Initializes a new instance of the <see cref="AsyncLock"/> class
         /// </summary>
         /// <param name="maxCount">The max count</param>
-        public AsyncLock(int maxCount) : this(1, maxCount) { } 
+        public AsyncLock(int maxCount) : this(1, maxCount) { }
         /// <summary>
         /// The handler class
         /// </summary>
@@ -54,10 +54,10 @@ namespace MVVMToolKit.Threading
             /// </summary>
             public void Dispose()
             {
-                if (!this._disposed)
+                if (!_disposed)
                 {
-                    this.semaphore.Release();
-                    this._disposed = true;
+                    semaphore.Release();
+                    _disposed = true;
                 }
             }
         }
@@ -68,8 +68,8 @@ namespace MVVMToolKit.Threading
         /// <returns>A task containing the disposable</returns>
         public async Task<IDisposable> LockAsync()
         {
-            await this.semaphore.WaitAsync();
-            return new Handler(this.semaphore); 
+            await semaphore.WaitAsync();
+            return new Handler(semaphore);
         }
     }
 }

@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Xml;
@@ -9,7 +9,7 @@ namespace MVVMToolKit.Helper
     /// <summary>
     /// The serialize helper class.
     /// </summary>
-    public class SerializeHelper
+    public static class SerializeHelper
     {
         /// <summary>
         /// Reads the data from xml file using the specified file name.
@@ -25,7 +25,7 @@ namespace MVVMToolKit.Helper
         {
             try
             {
-                using StreamReader streamReader = new StreamReader(fileName);
+                using StreamReader streamReader = new(fileName);
                 string xmlData = streamReader.ReadToEnd();
                 T? result =
                     useDataContractSerialize
@@ -51,9 +51,9 @@ namespace MVVMToolKit.Helper
         {
             try
             {
-                using StringReader reader = new StringReader(xmlData);
+                using StringReader reader = new(xmlData);
                 XmlReader xmlReader = XmlReader.Create(reader);
-                DataContractSerializer serializer = new DataContractSerializer(typeof(T));
+                DataContractSerializer serializer = new(typeof(T));
                 return serializer.ReadObject(xmlReader) as T;
             }
             catch (Exception)
@@ -73,9 +73,9 @@ namespace MVVMToolKit.Helper
         {
             try
             {
-                using StringReader stringReader = new StringReader(xmlData);
-                using XmlTextReader xmlReader = new XmlTextReader(stringReader);
-                XmlSerializer serializer = new XmlSerializer(typeof(T));
+                using StringReader stringReader = new(xmlData);
+                using XmlTextReader xmlReader = new(stringReader);
+                XmlSerializer serializer = new(typeof(T));
                 return serializer.Deserialize(xmlReader) as T;
             }
             catch (Exception)
@@ -98,19 +98,17 @@ namespace MVVMToolKit.Helper
         {
             try
             {
-                using (TextWriter streamWriter = new StreamWriter(fileName, false, Encoding.UTF8))
-                {
-                    string xmlData =
-                        useDataContractSerialize
-                            ? DataContractSerializerSerialize(target)
-                            : XmlSerializerSerialize(target);
+                using TextWriter streamWriter = new StreamWriter(fileName, false, Encoding.UTF8);
+                string xmlData =
+                    useDataContractSerialize
+                        ? DataContractSerializerSerialize(target)
+                        : XmlSerializerSerialize(target);
 
-                    streamWriter.Write(xmlData);
-                }
+                streamWriter.Write(xmlData);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return;
+                // ignored
             }
         }
 
@@ -124,15 +122,15 @@ namespace MVVMToolKit.Helper
         {
             try
             {
-                StringBuilder sb = new StringBuilder();
+                StringBuilder sb = new();
 
-                XmlWriterSettings settings = new XmlWriterSettings
+                XmlWriterSettings settings = new()
                 {
                     Indent = true,
                 };
 
                 using XmlWriter xmlWriter = XmlWriter.Create(sb, settings);
-                DataContractSerializer serializer = new DataContractSerializer(typeof(T));
+                DataContractSerializer serializer = new(typeof(T));
                 serializer.WriteObject(xmlWriter, obj);
                 xmlWriter.Flush();
 
@@ -154,11 +152,11 @@ namespace MVVMToolKit.Helper
         {
             try
             {
-                XmlSerializer serializer = new XmlSerializer(typeof(T));
+                XmlSerializer serializer = new(typeof(T));
                 string xmlData;
-                using (MemoryStream memStream = new MemoryStream())
+                using (MemoryStream memStream = new())
                 {
-                    XmlWriterSettings settings = new XmlWriterSettings
+                    XmlWriterSettings settings = new()
                     {
                         Indent = true,
                         IndentChars = new string(' ', 4),

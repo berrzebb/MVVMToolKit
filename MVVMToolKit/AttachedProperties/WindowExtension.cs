@@ -2,27 +2,27 @@
 
 namespace MVVMToolKit.AttachedProperties
 {
-    public class LayoutExtension
+    public static class LayoutExtension
     {
         public static readonly DependencyProperty IsDragWindowProperty = DependencyProperty.RegisterAttached("IsDragWindow", typeof(bool), typeof(LayoutExtension), new PropertyMetadata(IsDragWindowPropertyChanged));
 
-        public static object GetIsDragWindow(FrameworkElement target)
+        private static object GetIsDragWindow(FrameworkElement target)
             => target.GetValue(IsDragWindowProperty);
 
         public static void SetIsDragWindow(FrameworkElement target, object value) =>
             target.SetValue(IsDragWindowProperty, value);
 
-        private static FrameworkElement? _associatedObject;
+        private static FrameworkElement? AssociatedObject;
 
         private static void IsDragWindowPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (d is not Window window) return;
-            if (e.NewValue is not bool isDragWindow) return;
-            if (_associatedObject == null)
+            if (e.NewValue is not bool) return;
+            if (AssociatedObject == null)
             {
-                _associatedObject = window;
-                _associatedObject.Loaded += AssociatedObjectOnLoaded;
-                _associatedObject.Unloaded += AssociatedObjectOnUnloaded;
+                AssociatedObject = window;
+                AssociatedObject.Loaded += AssociatedObjectOnLoaded;
+                AssociatedObject.Unloaded += AssociatedObjectOnUnloaded;
 
             }
 
@@ -30,26 +30,26 @@ namespace MVVMToolKit.AttachedProperties
 
         private static void AssociatedObjectOnUnloaded(object sender, RoutedEventArgs e)
         {
-            if (_associatedObject == null) return;
-            _associatedObject.MouseMove -= AssociatedObject_MouseMove;
+            if (AssociatedObject == null) return;
+            AssociatedObject.MouseMove -= AssociatedObject_MouseMove;
         }
 
         private static void AssociatedObjectOnLoaded(object sender, RoutedEventArgs e)
         {
-            if (_associatedObject == null) return;
-            _associatedObject.MouseMove += AssociatedObject_MouseMove;
+            if (AssociatedObject == null) return;
+            AssociatedObject.MouseMove += AssociatedObject_MouseMove;
         }
         private static void DoDragWindow(bool isDragging = false)
         {
-            if (_associatedObject == null) return;
+            if (AssociatedObject == null) return;
             Window? targetWindow;
-            if (_associatedObject is Window window)
+            if (AssociatedObject is Window window)
             {
                 targetWindow = window;
             }
             else
             {
-                targetWindow = Window.GetWindow(_associatedObject);
+                targetWindow = Window.GetWindow(AssociatedObject);
             }
             if (targetWindow == null) return;
 
@@ -58,8 +58,8 @@ namespace MVVMToolKit.AttachedProperties
         }
         private static void AssociatedObject_MouseMove(object sender, MouseEventArgs e)
         {
-            if (_associatedObject == null) return;
-            bool isDragWindow = (bool)GetIsDragWindow(_associatedObject);
+            if (AssociatedObject == null) return;
+            bool isDragWindow = (bool)GetIsDragWindow(AssociatedObject);
             if (isDragWindow) DoDragWindow(e.LeftButton == MouseButtonState.Pressed);
 
         }

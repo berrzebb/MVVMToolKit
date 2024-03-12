@@ -33,16 +33,16 @@ namespace MVVMToolKit.Converters
         {
             if (value == null)
             {
-                return this.FalseValue;
+                return FalseValue;
             }
 
             var name = value.GetType().Name;
             if (name == (string?)parameter)
             {
-                return this.TrueValue;
+                return TrueValue;
             }
 
-            return this.FalseValue;
+            return FalseValue;
         }
 
         /// <summary>

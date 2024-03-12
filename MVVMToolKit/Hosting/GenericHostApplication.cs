@@ -1,4 +1,5 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
+using System.IO;
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,15 +14,16 @@ using MVVMToolKit.Interfaces;
 using MVVMToolKit.Ioc;
 using MVVMToolKit.Navigation.Mapping;
 using MVVMToolKit.Services;
+using MVVMToolKit.Templates;
 using MVVMToolKit.Threading.UI;
 using MVVMToolKit.Utilities;
 
 namespace MVVMToolKit.Hosting
 {
     using Ioc.Modules;
-    using MVVMToolKit.Navigation.Mapping.Internals;
-    using MVVMToolKit.Navigation.Zones;
+    using Navigation.Mapping.Internals;
     using Navigation.Views;
+    using Navigation.Zones;
 
     /// <summary>
     /// The generic host application class.
@@ -33,7 +35,9 @@ namespace MVVMToolKit.Hosting
         /// Gets the value of the host.
         /// </summary>
         public static IHost? Host { get; private set; }
-
+        private bool CanGenerateDump = false;
+        private CoreDumpHelper.MiniDumpType DumpType = CoreDumpHelper.MiniDumpType.MiniDumpNormal;
+        private Action<string> getPath;
         /// <summary>
         /// The logger.
         /// </summary>
@@ -46,6 +50,20 @@ namespace MVVMToolKit.Hosting
 
         private readonly IModuleCatalog? _moduleCatalog;
         private readonly IMappingRegistry _mappingRegistry = new MappingManager();
+        protected virtual string GetDumpPath()
+        {
+            var assembly = Assembly.GetEntryAssembly();
+            string? dirPath = Path.GetDirectoryName(assembly?.Location);
+            string exeName = AppDomain.CurrentDomain.FriendlyName;
+            string dateTime = DateTime.Now.ToString("[yyyy-MM-dd][HH-mm-ss-fff]");
+
+            return $"{dirPath}/[{exeName}]{dateTime}.dmp";
+        }
+        protected void SetDumpOption(bool canGenerateDump, CoreDumpHelper.MiniDumpType dumpType = CoreDumpHelper.MiniDumpType.MiniDumpNormal)
+        {
+            CanGenerateDump = canGenerateDump;
+            DumpType = dumpType;
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GenericHostApplication"/> class.
@@ -87,7 +105,7 @@ namespace MVVMToolKit.Hosting
         private void OnInitializeModule()
         {
             if (_moduleCatalog == null) return;
-            foreach (IModule module in _moduleCatalog.Modules)
+            foreach (IModule module in _moduleCatalog)
             {
                 module.Initialize(Host?.Services).SafeFireAndForget();
             }
@@ -159,7 +177,7 @@ namespace MVVMToolKit.Hosting
 
             Logger = Host.Services.GetRequiredService<ILogger<GenericHostApplication>>();
             _disposableService = Host.Services.GetRequiredService<IDisposableObjectService>();
-
+            var popupService = Host.Services.GetRequiredService<IDialogService>();
             if (CheckDuplicateProcess())
             {
                 Current.Shutdown(0);
@@ -168,6 +186,7 @@ namespace MVVMToolKit.Hosting
             OnInitializeModule();
             OnInitializeMapping();
 
+            popupService.Register<PopupWindow>("Default");
             base.OnStartup(e);
         }
 
@@ -227,12 +246,12 @@ namespace MVVMToolKit.Hosting
             services.AddSingleton<IDispatcherService, DispatcherService>().AllowLazy();
             services.AddSingleton<IDisposableObjectService, DisposableObjectService>();
 
-            services.AddSingleton<IDialogService, DialogService>();
             services.AddSingleton<IZoneRegistry, ZoneRegistry>();
             services.AddSingleton((IRouteRegistry)_mappingRegistry);
-            services.AddSingleton<IViewNavigator, ViewNavigator>();
+            services.AddSingleton<IZoneNavigator, ZoneNavigator>();
+            services.AddSingleton<IDialogService, DialogService>();
 
-            IEnumerable<IModule> currentModules = this._moduleCatalog?.Modules.ToArray() ?? Array.Empty<IModule>();
+            IEnumerable<IModule> currentModules = _moduleCatalog?.ToArray() ?? Array.Empty<IModule>();
             foreach (IModule module in currentModules)
             {
                 module.ConfigureServices(services);
@@ -267,7 +286,7 @@ namespace MVVMToolKit.Hosting
         }
 
         /// <summary>
-        /// Initializes the view models using the specified services.
+        /// Initializes the popupContext models using the specified services.
         /// </summary>
         /// <param name="services">The services.</param>
         protected virtual void InitializeViewModels(IServiceCollection services)
@@ -310,7 +329,11 @@ namespace MVVMToolKit.Hosting
 
                 Logger?.LogError(e.Exception, $"[App Error Catch] {e.Exception}");
                 Logger?.LogError(e.Exception, $"[App_DispatcherUnhandledException] {e.Exception.Message}");
-                CoreDumpHelper.CreateMemoryDump();
+                if (CanGenerateDump)
+                {
+                    string dumpPath = GetDumpPath();
+                    CoreDumpHelper.CreateMemoryDump(DumpType, dumpPath);
+                }
             }
             catch
             {

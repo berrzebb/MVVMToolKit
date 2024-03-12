@@ -11,11 +11,11 @@ namespace MVVMToolKit.Hosting.Internal
         /// <summary>
         /// The disposable
         /// </summary>
-        private readonly DisposableList<IDisposable> disposableList = new DisposableList<IDisposable>();
+        private readonly DisposableList<IDisposable> disposableList = new();
         /// <summary>
         /// The disposable
         /// </summary>
-        private readonly Dictionary<Guid, IDisposable> disposableDictionary = new Dictionary<Guid, IDisposable>();
+        private readonly Dictionary<Guid, IDisposable> disposableDictionary = new();
         /// <summary>
         /// The disposed value
         /// </summary>
@@ -28,8 +28,8 @@ namespace MVVMToolKit.Hosting.Internal
         public void Add(IDisposableObject disposable)
         {
             disposable.Guid = Guid.NewGuid();
-            this.disposableDictionary.Add(disposable.Guid, disposable);
-            this.disposableList.Add(disposable);
+            disposableDictionary.Add(disposable.Guid, disposable);
+            disposableList.Add(disposable);
         }
 
         /// <summary>
@@ -39,7 +39,7 @@ namespace MVVMToolKit.Hosting.Internal
         /// <returns>The bool</returns>
         public bool Exists(Guid guid)
         {
-            return this.disposableDictionary.ContainsKey(guid);
+            return disposableDictionary.ContainsKey(guid);
         }
 
         /// <summary>
@@ -48,14 +48,14 @@ namespace MVVMToolKit.Hosting.Internal
         /// <param name="disposable">The disposable</param>
         public void Remove(IDisposableObject disposable)
         {
-            if (!this.Exists(disposable.Guid))
+            if (!Exists(disposable.Guid))
             {
                 return;
             }
 
-            if (this.disposableList.Remove(disposable))
+            if (disposableList.Remove(disposable))
             {
-                this.disposableDictionary.Remove(disposable.Guid);
+                disposableDictionary.Remove(disposable.Guid);
             }
 
         }
@@ -66,17 +66,17 @@ namespace MVVMToolKit.Hosting.Internal
         /// <param name="disposing">The disposing</param>
         private void Dispose(bool disposing)
         {
-            if (!this.disposedValue)
+            if (!disposedValue)
             {
                 if (disposing)
                 {
                     // TODO: 관리형 상태(관리형 개체)를 삭제합니다.
                 }
-                this.disposableList.Dispose();
-                this.disposableDictionary.Clear();
+                disposableList.Dispose();
+                disposableDictionary.Clear();
                 // TODO: 비관리형 리소스(비관리형 개체)를 해제하고 종료자를 재정의합니다.
                 // TODO: 큰 필드를 null로 설정합니다.
-                this.disposedValue = true;
+                disposedValue = true;
             }
         }
 
@@ -84,7 +84,7 @@ namespace MVVMToolKit.Hosting.Internal
         ~DisposableObjectService()
         {
             // 이 코드를 변경하지 마세요. 'Dispose(bool disposing)' 메서드에 정리 코드를 입력합니다.
-            this.Dispose(disposing: false);
+            Dispose(disposing: false);
         }
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace MVVMToolKit.Hosting.Internal
         public void Dispose()
         {
             // 이 코드를 변경하지 마세요. 'Dispose(bool disposing)' 메서드에 정리 코드를 입력합니다.
-            this.Dispose(disposing: true);
+            Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }
     }

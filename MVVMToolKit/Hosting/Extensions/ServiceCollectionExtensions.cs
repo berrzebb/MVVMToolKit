@@ -1,4 +1,4 @@
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using MVVMToolKit.Hosting.Core;
 using MVVMToolKit.Hosting.Internal;
 using MVVMToolKit.Ioc;
@@ -11,80 +11,97 @@ namespace MVVMToolKit.Hosting.Extensions
     public static class ServiceCollectionExtensions
     {
         /// <summary>
-        /// Adds the view using the specified services
+        /// Adds the popupContext using the specified services
         /// </summary>
-        /// <typeparam name="TView">The view</typeparam>
+        /// <typeparam name="TView">The popupContext</typeparam>
+        /// <param name="services">The services</param>
+        /// <returns>The service collection.</returns>
+        public static IServiceCollection AddView<TView>(this IServiceCollection services)
+            where TView : FrameworkElement
+        {
+            return services.AddView<TView>(ServiceLifetime.Transient);
+        }
+        public static IServiceCollection AddService<TService>(this IServiceCollection services, Func<IServiceProvider, TService> factory, ServiceLifetime lifetime)
+        {
+            services.Add(new ServiceDescriptor(typeof(TService), provider =>
+            {
+                var service = factory(provider);
+                if (service is IDisposableObject disposable)
+                {
+                    IDisposableObjectService disposableObjectService = provider.GetRequiredService<IDisposableObjectService>();
+                    disposableObjectService.Add(disposable);
+                }
+                return service;
+            },
+                lifetime));
+
+            Type registeredType = typeof(TService);
+            TypeProvider.RegisterType(registeredType);
+            return services;
+        }
+        /// <summary>
+        /// Adds the popupContext using the specified services
+        /// </summary>
+        /// <typeparam name="TView">The popupContext</typeparam>
         /// <param name="services">The services</param>
         /// <param name="lifeTime">Service Lifetime.</param>
-        /// <returns>The service collection</returns>
-        public static IServiceCollection AddView<TView>(this IServiceCollection services, ServiceLifetime lifeTime = ServiceLifetime.Transient)
+        /// <returns>The service collection.</returns>
+        public static IServiceCollection AddView<TView>(this IServiceCollection services, ServiceLifetime lifeTime)
             where TView : FrameworkElement
         {
             return services.AddView(provider => ActivatorUtilities.CreateInstance<TView>(provider), lifeTime);
         }
+
+
         /// <summary>
-        /// Adds the view model using the specified services
+        /// Adds the popupContext using the specified services
         /// </summary>
-        /// <typeparam name="TViewModel">The view model</typeparam>
+        /// <typeparam name="TView">The popupContext</typeparam>
+        /// <param name="services">The services</param>
+        /// <param name="createView">The creation popupContext</param>
+        /// <param name="lifeTime">Service Lifetime.</param>
+        /// <returns>The services</returns>
+        public static IServiceCollection AddView<TView>(this IServiceCollection services, Func<IServiceProvider, TView> createView, ServiceLifetime lifeTime)
+            where TView : FrameworkElement
+        {
+            return services.AddService(createView, lifeTime);
+        }
+        /// <summary>
+        /// Adds the popupContext model using the specified services
+        /// </summary>
+        /// <typeparam name="TViewModel">The popupContext model</typeparam>
+        /// <param name="services">The services</param>
+        /// <returns>The service collection.</returns>
+        public static IServiceCollection AddViewModel<TViewModel>(this IServiceCollection services)
+            where TViewModel : class, IWpfViewModel
+        {
+            return services.AddViewModel<TViewModel>(ServiceLifetime.Transient);
+        }
+        /// <summary>
+        /// Adds the popupContext model using the specified services
+        /// </summary>
+        /// <typeparam name="TViewModel">The popupContext model</typeparam>
         /// <param name="services">The services</param>
         /// <param name="lifeTime">Service Lifetime.</param>
-        /// <returns>The service collection</returns>
-        public static IServiceCollection AddViewModel<TViewModel>(this IServiceCollection services, ServiceLifetime lifeTime = ServiceLifetime.Transient)
-            where TViewModel : class, IWPFViewModel
+        /// <returns>The service collection.</returns>
+        public static IServiceCollection AddViewModel<TViewModel>(this IServiceCollection services, ServiceLifetime lifeTime)
+            where TViewModel : class, IWpfViewModel
         {
             return services.AddViewModel(provider => ActivatorUtilities.CreateInstance<TViewModel>(provider), lifeTime);
         }
-
         /// <summary>
-        /// Adds the view using the specified services
+        /// Adds the popupContext model using the specified services
         /// </summary>
-        /// <typeparam name="TView">The view</typeparam>
+        /// <typeparam name="TViewModel">The popupContext model</typeparam>
         /// <param name="services">The services</param>
-        /// <param name="createView">The create view</param>
-        /// <param name="lifeTime">Service Lifetime.</param>
-        /// <returns>The services</returns>
-        public static IServiceCollection AddView<TView>(this IServiceCollection services, Func<IServiceProvider, TView> createView, ServiceLifetime lifeTime = ServiceLifetime.Transient)
-            where TView : FrameworkElement
-        {
-            services.Add(new ServiceDescriptor(typeof(TView), provider =>
-            {
-                var view = createView(provider);
-                if (view is IDisposableObject disposable)
-                {
-                    var disposableObjectService = provider.GetRequiredService<IDisposableObjectService>();
-                    disposableObjectService.Add(disposable);
-                }
-                return view;
-            }, lifeTime));
-            var registeredType = typeof(TView);
-
-            TypeProvider.RegisterType(registeredType);
-            return services;
-        }
-        /// <summary>
-        /// Adds the view model using the specified services
-        /// </summary>
-        /// <typeparam name="TViewModel">The view model</typeparam>
-        /// <param name="services">The services</param>
-        /// <param name="createViewModel">The create view model</param>
+        /// <param name="createViewModel">The creation popupContext model</param>
         /// <param name="lifeTime">Service Lifetime.</param>
 
         /// <returns>The services</returns>
-        public static IServiceCollection AddViewModel<TViewModel>(this IServiceCollection services, Func<IServiceProvider, TViewModel> createViewModel, ServiceLifetime lifeTime = ServiceLifetime.Transient)
-            where TViewModel : class, IWPFViewModel, IDisposableObject
+        public static IServiceCollection AddViewModel<TViewModel>(this IServiceCollection services, Func<IServiceProvider, TViewModel> createViewModel, ServiceLifetime lifeTime)
+            where TViewModel : class, IWpfViewModel, IDisposableObject
         {
-            services.Add(new ServiceDescriptor(typeof(TViewModel), provider =>
-            {
-                var viewModel = createViewModel(provider);
-                var disposableObjectService = provider.GetRequiredService<IDisposableObjectService>();
-                disposableObjectService.Add(viewModel);
-                return viewModel;
-            }, lifeTime));
-            var registeredType = typeof(TViewModel);
-
-            TypeProvider.RegisterType(registeredType);
-
-            return services;
+            return services.AddService(createViewModel, lifeTime);
         }
 
         public static IServiceCollection AllowLazy(this IServiceCollection services)

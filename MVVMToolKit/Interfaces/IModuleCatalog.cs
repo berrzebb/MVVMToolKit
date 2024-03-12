@@ -1,8 +1,9 @@
 ﻿namespace MVVMToolKit.Interfaces
 {
-    public interface IModuleCatalog
+    public interface IModuleCatalog : IEnumerable<IModule>
     {
-        void AddModule(IModule? module);
-        IEnumerable<IModule> Modules { get; }
+        IModuleCatalog AddModule(IModule? module);
+        IModuleCatalog AddModule(Type moduleType);
+        IModuleCatalog AddModule<TModule>() where TModule : IModule;
     }
 }

@@ -15,9 +15,9 @@ namespace WithModuleSample
         }
 
         [RelayCommand]
-        private void ChangeView(string ViewType)
+        private void ChangeView(string viewType)
         {
-            switch (ViewType)
+            switch (viewType)
             {
                 case "First":
                     Selector = 0;
@@ -29,18 +29,12 @@ namespace WithModuleSample
             }
         }
 
-        partial void OnSelectorChanged(int value)
-        {
-
-        }
-
         /// <inheritdoc />
-        public string NavigateTo() =>
-            Selector switch
-            {
-                0 => nameof(FirstView),
-                1 => nameof(SecondaryView),
-                _ => nameof(FirstView)
-            };
+        public string NavigateTo() => Selector switch
+        {
+            0 => nameof(FirstView),
+            1 => nameof(SecondaryView),
+            _ => nameof(FirstView)
+        };
     }
 }

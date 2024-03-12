@@ -12,10 +12,10 @@
         {
 
 
-            var moduleDir = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, moduleDirectory);
+            var moduleDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, moduleDirectory);
             if (!Directory.Exists(moduleDir)) return;
 
-            this.Initialize(moduleDir);
+            Initialize(moduleDir);
 
         }
 
@@ -28,7 +28,7 @@
             }
             catch (Exception ex)
             {
-                this.Logger?.LogError(ex, $"[ModuleCatalog] {assemblyPath} Load Exception");
+                Logger?.LogError(ex, $"[ModuleCatalog] {assemblyPath} Load Exception");
             }
 
             var modules = assembly?
@@ -38,7 +38,7 @@
 
             foreach (var module in modules)
             {
-                this.AddModule(module);
+                AddModule(module);
             }
         }
         private void Initialize(string moduleDir)
@@ -46,7 +46,7 @@
             foreach (string file in Directory.GetFiles(moduleDir))
             {
                 //load our newly added assembly
-                this.ResolveAssembly(file);
+                ResolveAssembly(file);
             }
         }
     }

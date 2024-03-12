@@ -14,8 +14,13 @@
     }
     public class MappingConfiguration : IMappingConfiguration
     {
-        public string? RouteName { get; set; }
-        public Type? ContextType { get; set; } = null;
+        public MappingConfiguration(string routeName = "")
+        {
+            RouteName = routeName;
+        }
+
+        public string RouteName { get; set; }
+        public Type? ContextType { get; protected set; }
         public string? ViewType { get; set; } = default;
 
 
@@ -29,7 +34,7 @@
     where TViewModel : INotifyPropertyChanged
     {
 
-        public MappingConfiguration() => ContextType = typeof(TViewModel);
+        public MappingConfiguration(string routeName = "") : base(routeName) => ContextType = typeof(TViewModel);
     }
 
 }
