@@ -70,13 +70,13 @@ namespace MVVMToolKit.Converters
         /// <returns>변환된 Visibility 값입니다.</returns>
         public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
-            if (!value.IsNumericType() || !this.Target.IsNumericType())
+            if (!value.IsNumericType() || !Target.IsNumericType())
             {
-                return this.FalseValue;
+                return FalseValue;
             }
 
             Func<object?, bool> comparer;
-            switch (this.Op)
+            switch (Op)
             {
                 case OpType.Less: comparer = value.Less; break;
                 case OpType.LessEq: comparer = value.LessEquals; break;
@@ -85,7 +85,7 @@ namespace MVVMToolKit.Converters
                 default: comparer = value.Eq; break;
             }
 
-            return comparer(this.Target) ? this.TrueValue : this.FalseValue;
+            return comparer(Target) ? TrueValue : FalseValue;
         }
 
         /// <summary>

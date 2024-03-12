@@ -20,13 +20,13 @@
         {
             Debug.Assert(target != null);
 
-            target.SetValue(ZoneNameProperty, value);
+            target?.SetValue(ZoneNameProperty, value);
         }
         public static string? GetZoneName(DependencyObject target)
         {
             Debug.Assert(target != null);
 
-            return target.GetValue(ZoneNameProperty) as string;
+            return target?.GetValue(ZoneNameProperty) as string;
         }
         private static bool IsInDesignMode(DependencyObject element)
         {
@@ -38,13 +38,15 @@
         }
         private static void OnZoneNameChanged(DependencyObject element, DependencyPropertyChangedEventArgs args)
         {
+
             if (IsInDesignMode(element)) return;
             string? zoneName = GetZoneName(element);
 
             if (string.IsNullOrEmpty(zoneName)) return;
 
-            Zones.TryAdd(zoneName, element);
-        }
 
+            Zones.AddOrUpdate(zoneName, v => element, (v, current) => element);
+
+        }
     }
 }

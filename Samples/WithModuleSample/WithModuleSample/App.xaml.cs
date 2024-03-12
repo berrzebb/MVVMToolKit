@@ -7,6 +7,8 @@ using MVVMToolKit.Ioc;
 using MVVMToolKit.Ioc.Modules;
 using MVVMToolKit.Navigation.Mapping;
 using ProtoTypeModule;
+using WithModuleSample.ViewModels;
+using WithModuleSample.Views;
 
 namespace WithModuleSample
 {
@@ -15,6 +17,11 @@ namespace WithModuleSample
     /// </summary>
     public partial class App
     {
+        public App()
+        {
+            SetDumpOption(true);
+        }
+
         /// <inheritdoc />
         protected override IModuleCatalog CreateModuleCatalog()
         {
@@ -32,6 +39,8 @@ namespace WithModuleSample
             services.AddViewModel<SwitchViewModel>();
             services.AddViewModel<RegionableViewModel>();
 
+            services.AddViewModel<WithPopupViewModel>();
+
         }
         protected override void InitializeViews(IServiceCollection services)
         {
@@ -42,7 +51,13 @@ namespace WithModuleSample
             services.AddView<ThirdView>();
             services.AddView<RegionableView>();
 
-            services.AddView<InjectedView>();
+            services.AddView<GoldenView>();
+            services.AddView<SilverView>();
+
+            services.AddView<WithPopupView>();
+
+            services.AddView<PopupContentView>();
+
         }
 
         /// <inheritdoc />
@@ -70,9 +85,24 @@ namespace WithModuleSample
             {
                 RouteName = "Golden",
                 ViewMode = ViewMode.Single,
-                ViewType = nameof(InjectedView)
+                ViewType = nameof(GoldenView)
+            });
+            registry.Register(new MappingConfiguration()
+            {
+                RouteName = "Silver",
+                ViewMode = ViewMode.Single,
+                ViewType = nameof(SilverView)
             });
 
+            registry.Register(new MappingConfiguration<WithPopupViewModel>()
+            {
+                RouteName = "PopupZone",
+                ViewType = nameof(WithPopupView)
+            });
+            registry.Register(new MappingConfiguration<WithPopupViewModel>()
+            {
+                ViewType = nameof(PopupContentView)
+            });
         }
 
         /// <inheritdoc />
@@ -80,17 +110,16 @@ namespace WithModuleSample
         {
             base.OnStartup(e);
             var proto = ContainerProvider.Resolve<IPrototypeInterface>();
-            var viewNavigator = ContainerProvider.Resolve<IViewNavigator>();
+            var viewNavigator = ContainerProvider.Resolve<IZoneNavigator>();
 
-            proto.Print();
+            proto?.Print();
             MainWindow = ContainerProvider.Resolve<MainShell>();
-            MainWindow.Show();
+            MainWindow?.Show();
 
-            viewNavigator.Navigate("SingleViewZone", "Single");
-            viewNavigator.Navigate("SwitchableViewZone", typeof(SwitchViewModel));
-            viewNavigator.Navigate("InjectableViewZone", "Injection", typeof(RegionableViewModel));
-
+            viewNavigator?.Navigate("SingleViewZone", "Single");
+            viewNavigator?.Navigate("SwitchableViewZone", typeof(SwitchViewModel));
+            viewNavigator?.Navigate("InjectableViewZone", "Injection", typeof(RegionableViewModel));
+            viewNavigator?.Navigate("PopupViewZone", "PopupZone", typeof(WithPopupViewModel));
         }
     }
-
 }

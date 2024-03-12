@@ -1,4 +1,4 @@
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 
 namespace MVVMToolKit.Threading
@@ -22,7 +22,7 @@ namespace MVVMToolKit.Threading
 #endif
             private bool _disposed;
 
-            private readonly object SyncRoot = new();
+            private readonly object _syncRoot = new();
 
             public Task Completion => _completionSource.Task;
 
@@ -39,7 +39,7 @@ namespace MVVMToolKit.Threading
 
             public void Cancel()
             {
-                lock (SyncRoot)
+                lock (_syncRoot)
                 {
                     if (!_disposed) _cancellationTokenSource.Cancel();
                 }
@@ -49,7 +49,7 @@ namespace MVVMToolKit.Threading
             {
                 try
                 {
-                    lock (SyncRoot)
+                    lock (_syncRoot)
                     {
                         _cancellationTokenSource.Dispose();
                         _disposed = true;
@@ -73,7 +73,7 @@ namespace MVVMToolKit.Threading
         /// </summary>
         private CancelableTask(bool allowConcurrency)
         {
-            this._allowConcurrency = allowConcurrency;
+            _allowConcurrency = allowConcurrency;
         }
 
         public async Task<TResult> RunAsync<TResult>(
@@ -131,7 +131,7 @@ namespace MVVMToolKit.Threading
             return operation.Completion;
         }
 
-        public bool Cancel() => CancelAsync().IsCompleted == false;
+        public bool Cancel() => !(CancelAsync().IsCompleted);
 
         public ICancelableTask Create(bool allowConcurrency = false) => new CancelableTask(allowConcurrency);
     }

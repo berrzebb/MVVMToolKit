@@ -206,7 +206,7 @@ namespace MVVMToolKit.Helper.Native
         /// <summary>
         /// The zero
         /// </summary>
-        public static readonly HandleRef NullHandleRef = new HandleRef(null, IntPtr.Zero);
+        public static readonly HandleRef NullHandleRef = new(null, IntPtr.Zero);
 
         /// <summary>
         /// Gets the dpi for monitor using the specified hmonitor
@@ -404,10 +404,10 @@ namespace MVVMToolKit.Helper.Native
             /// <param name="r">The </param>
             public RECT(Rect r)
             {
-                this.left = (int)r.Left;
-                this.top = (int)r.Top;
-                this.right = (int)r.Right;
-                this.bottom = (int)r.Bottom;
+                left = (int)r.Left;
+                top = (int)r.Top;
+                right = (int)r.Right;
+                bottom = (int)r.Bottom;
             }
 
             /// <summary>
@@ -426,7 +426,7 @@ namespace MVVMToolKit.Helper.Native
             /// <summary>
             /// Gets the value of the size
             /// </summary>
-            public Size Size => new Size(this.right - this.left, this.bottom - this.top);
+            public Size Size => new(right - left, bottom - top);
         }
 
         // use this in cases where the Native API takes a POINT not a POINT*
@@ -515,11 +515,11 @@ namespace MVVMToolKit.Helper.Native
             /// <summary>
             /// The rect
             /// </summary>
-            internal RECT rcMonitor = new RECT();
+            internal RECT rcMonitor = new();
             /// <summary>
             /// The rect
             /// </summary>
-            internal RECT rcWork = new RECT();
+            internal RECT rcWork = new();
             /// <summary>
             /// The dw flags
             /// </summary>
@@ -568,10 +568,10 @@ namespace MVVMToolKit.Helper.Native
             /// <param name="r">The </param>
             public COMRECT(Rect r)
             {
-                this.left = (int)r.X;
-                this.top = (int)r.Y;
-                this.right = (int)r.Right;
-                this.bottom = (int)r.Bottom;
+                left = (int)r.X;
+                top = (int)r.Y;
+                right = (int)r.Right;
+                bottom = (int)r.Bottom;
             }
 
             /// <summary>
@@ -608,7 +608,7 @@ namespace MVVMToolKit.Helper.Native
             /// <returns>The string</returns>
             public override string ToString()
             {
-                return "Left = " + this.left + " Top " + this.top + " Right = " + this.right + " Bottom = " + this.bottom;
+                return "Left = " + left + " Top " + top + " Right = " + right + " Bottom = " + bottom;
             }
         }
 

@@ -1,5 +1,4 @@
-﻿using System.Windows;
-using Infrastructure;
+﻿using Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using MVVMToolKit.Interfaces;
 using MVVMToolKit.Navigation.Mapping;
@@ -15,7 +14,6 @@ namespace ProtoTypeModule
 
         public Task Initialize(IServiceProvider? provider)
         {
-            MessageBox.Show("Initlaize Proto");
             return Task.CompletedTask;
 
         }
@@ -24,6 +22,5 @@ namespace ProtoTypeModule
         {
             services.AddSingleton<IPrototypeInterface, ProtoTypeInterface>();
         }
-
     }
 }

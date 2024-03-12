@@ -1,10 +1,10 @@
-namespace MVVMToolKit.Hosting.Core
+﻿namespace MVVMToolKit.Hosting.Core
 {
     /// <summary>
-    /// The iwpf view model interface.
+    /// The iwpf popupContext model interface.
     /// </summary>
     /// <seealso cref="IDisposableObject"/>
-    public interface IWPFViewModel : IDisposableObject
+    public interface IWpfViewModel : IDisposableObject
     {
         /// <summary>
         /// Initializes the dependency using the specified container provider.

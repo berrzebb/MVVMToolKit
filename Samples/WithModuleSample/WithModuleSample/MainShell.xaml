@@ -22,6 +22,9 @@
         <TabItem Header="Injection View">
             <ContentControl zones:ZoneRegistry.ZoneName="InjectableViewZone" />
         </TabItem>
-
+        <TabItem Header="Popup View">
+            <ContentControl zones:ZoneRegistry.ZoneName="PopupViewZone" />
+        </TabItem>
+        <TabItem Header="Async Update" />
     </TabControl>
 </Window>

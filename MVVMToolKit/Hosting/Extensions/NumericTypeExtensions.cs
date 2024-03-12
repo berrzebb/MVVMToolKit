@@ -2,7 +2,7 @@
 {
     public static class NumericTypeExtensions
     {
-        private static readonly HashSet<Type?> IntegralTypes = new HashSet<Type?>()
+        private static readonly HashSet<Type?> integralTypes = new()
         {
             typeof(sbyte),   typeof(sbyte?),
             typeof(byte),    typeof(byte?),
@@ -16,14 +16,14 @@
             typeof(nuint),   typeof(nuint?),
         };
 
-        private static readonly HashSet<Type?> FloatingPointTypes = new HashSet<Type?>()
+        private static readonly HashSet<Type?> floatingPointTypes = new()
         {
             typeof(float),   typeof(float?),
             typeof(double),  typeof(double?),
             typeof(decimal), typeof(decimal?),
         };
 
-        private static readonly HashSet<Type?> NumericTypes = new HashSet<Type?>(IntegralTypes.Concat(FloatingPointTypes));
+        private static readonly HashSet<Type?> numericTypes = new(integralTypes.Concat(floatingPointTypes));
 
         public static bool IsNumericType(this object? obj)
         {
@@ -32,10 +32,10 @@
 
         public static bool IsNumericType(this Type type)
         {
-            return NumericTypes.Contains(type);
+            return numericTypes.Contains(type);
         }
 
-        public static bool Eq(this object? source, object? target)
+        public static bool Eq(this object? source, object? target, double precision)
         {
             if (!source.IsNumericType())
             {
@@ -46,10 +46,11 @@
             {
                 return true;
             }
-
-            return (double?)source == (double?)target;
+            double lhs = Convert.ToDouble(source);
+            double rhs = Convert.ToDouble(target);
+            return Math.Abs(lhs - rhs) <= precision;
         }
-
+        public static bool Eq(this object? source, object? target) => Eq(source, target, 0.0001);
         public static bool Less(this object? source, object? target)
         {
             if (!source.IsNumericType())

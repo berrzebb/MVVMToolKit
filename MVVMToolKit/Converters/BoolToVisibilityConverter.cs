@@ -29,7 +29,7 @@ namespace MVVMToolKit.Converters
         {
             if (value is bool boolValue)
             {
-                return boolValue ? this.TrueValue : this.FalseValue;
+                return boolValue ? TrueValue : FalseValue;
             }
 
             return Binding.DoNothing;

@@ -19,11 +19,12 @@ namespace MVVMToolKit.Helper
         public static BitmapImage? CreateBitmapImage(string path, int decodePixelWidth = 300)
         {
             string imageFile = Path.GetFileName(path);
-            if(!File.Exists(path)){
+            if (!File.Exists(path))
+            {
                 return null;
             }
 
-            BitmapImage bitmap = new BitmapImage();
+            BitmapImage bitmap = new();
             bitmap.BeginInit();
             bitmap.CacheOption = BitmapCacheOption.OnDemand;
             bitmap.CreateOptions = BitmapCreateOptions.DelayCreation;
@@ -42,7 +43,7 @@ namespace MVVMToolKit.Helper
         /// <returns>The bitmap</returns>
         public static BitmapImage CreateBitmapImageByRecorce(string path, int decodePixelWidth = 300)
         {
-            BitmapImage bitmap = new BitmapImage();
+            BitmapImage bitmap = new();
             bitmap.BeginInit();
             bitmap.CacheOption = BitmapCacheOption.OnDemand;
             bitmap.CreateOptions = BitmapCreateOptions.DelayCreation;
@@ -52,7 +53,7 @@ namespace MVVMToolKit.Helper
 
             return bitmap;
         }
-        
+
         /// <summary>
         /// Describes whether set image for image
         /// </summary>
@@ -106,7 +107,7 @@ namespace MVVMToolKit.Helper
 
             byte[] binaryData = Convert.FromBase64String(base64Img);
 
-            BitmapImage bitmapImg = new BitmapImage();
+            BitmapImage bitmapImg = new();
             bitmapImg.BeginInit();
             bitmapImg.StreamSource = new MemoryStream(binaryData);
             bitmapImg.EndInit();

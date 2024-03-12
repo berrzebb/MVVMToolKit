@@ -22,8 +22,8 @@ namespace MVVMToolKit.Ioc
         /// <param name="serviceKey">Service Key(Optional)</param>
         public ContainerProviderExtension(Type? type, object? serviceKey)
         {
-            this.Type = type;
-            this.ServiceKey = serviceKey;
+            Type = type;
+            ServiceKey = serviceKey;
         }
         /// <summary>
         /// Initializes a new instance of the <see cref="ContainerProviderExtension"/> class.
@@ -49,7 +49,7 @@ namespace MVVMToolKit.Ioc
         /// <returns></returns>
         public override object? ProvideValue(IServiceProvider serviceProvider)
         {
-            return ContainerProvider.Resolve(this.Type, this.ServiceKey);
+            return ContainerProvider.Resolve(Type, ServiceKey);
         }
     }
 }

@@ -1,19 +1,12 @@
-﻿using System.Windows;
-using Infrastructure;
-using MVVMToolKit.Ioc;
+﻿using Infrastructure;
 
 namespace ProtoTypeModule
 {
-    using Microsoft.Extensions.Logging;
-
     public class ProtoTypeInterface : IPrototypeInterface
     {
-        private ILogger<ProtoTypeInterface> Logger = ContainerProvider.Resolve<ILogger<ProtoTypeInterface>>();
         /// <inheritdoc />
         public void Print()
         {
-            MessageBox.Show("Proto");
-            //Logger?.LogInformation("Proto");
         }
     }
 }

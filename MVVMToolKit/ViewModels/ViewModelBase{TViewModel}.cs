@@ -6,7 +6,7 @@ using MVVMToolKit.Interfaces;
 namespace MVVMToolKit.ViewModels
 {
     /// <summary>
-    /// The view model base class.
+    /// The popupContext model base class.
     /// </summary>
     /// <seealso cref="ViewModelBase"/>
     public abstract class ViewModelBase<TViewModel> : ViewModelBase
@@ -23,18 +23,18 @@ namespace MVVMToolKit.ViewModels
         /// <param name="provider">The provider.</param>
         protected ViewModelBase(IServiceProvider provider)
         {
-            this.currentProvider = provider;
-            this.dispatcherService = this.currentProvider.GetRequiredService<IDispatcherService>();
-            this.disposableObjectService = this.currentProvider.GetRequiredService<IDisposableObjectService>();
-            this.Logger = this.currentProvider.GetRequiredService<ILogger<TViewModel>>();
+            currentProvider = provider;
+            dispatcherService = currentProvider.GetRequiredService<IDispatcherService>();
+            disposableObjectService = currentProvider.GetRequiredService<IDisposableObjectService>();
+            Logger = currentProvider.GetRequiredService<ILogger<TViewModel>>();
             Logger.LogDebug($"{typeof(TViewModel).Name} Initialize.");
-            this.Initialize(this.currentProvider);
+            Initialize(currentProvider);
         }
 
         private void Initialize(IServiceProvider provider)
         {
 
-            this.InitializeDependency(provider);
+            InitializeDependency(provider);
         }
 
         /// <summary>

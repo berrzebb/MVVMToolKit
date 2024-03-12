@@ -18,7 +18,7 @@ namespace MVVMToolKit.Helper.ScreenHelper
         /// <summary>
         /// Indicates if we have more than one monitor.
         /// </summary>
-        private static readonly bool MultiMonitorSupport;
+        private static readonly bool s_multiMonitorSupport;
 
         // This identifier is just for us, so that we don't try to call the multimon
         // functions if we just need the primary monitor... this is safer for
@@ -26,25 +26,22 @@ namespace MVVMToolKit.Helper.ScreenHelper
         /// <summary>
         /// The primary monitor
         /// </summary>
-        private const int PRIMARY_MONITOR = unchecked((int)0xBAADF00D);
+        private const int PrimaryMonitor = unchecked((int)0xBAADF00D);
 
         /// <summary>
-        /// The monitorinfof primary
+        /// The monitor info primary.
         /// </summary>
-        private const int MONITORINFOF_PRIMARY = 0x00000001;
+        private const int MonitorInfofPrimary = 0x00000001;
 
         /// <summary>
         /// The monitor handle.
         /// </summary>
-        private readonly IntPtr monitorHandle;
+        private readonly IntPtr _monitorHandle;
 
         /// <summary>
         /// Initializes static members of the <see cref="Screen"/> class.
         /// </summary>
-        static Screen()
-        {
-            MultiMonitorSupport = NativeMethods.GetSystemMetrics(NativeMethods.SystemMetric.SM_CMONITORS) != 0;
-        }
+        static Screen() => s_multiMonitorSupport = NativeMethods.GetSystemMetrics(NativeMethods.SystemMetric.SM_CMONITORS) != 0;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Screen"/> class.
@@ -68,7 +65,7 @@ namespace MVVMToolKit.Helper.ScreenHelper
 
                 try
                 {
-                    if (monitor == (IntPtr)PRIMARY_MONITOR)
+                    if (monitor == (IntPtr)PrimaryMonitor)
                     {
                         var ptr = NativeMethods.MonitorFromPoint(new NativeMethods.POINTSTRUCT(0, 0), NativeMethods.MonitorDefault.MONITOR_DEFAULTTOPRIMARY);
                         NativeMethods.GetDpiForMonitor(ptr, NativeMethods.DpiType.EFFECTIVE, out dpiX, out _);
@@ -94,18 +91,18 @@ namespace MVVMToolKit.Helper.ScreenHelper
                     }
                 }
 
-                this.ScaleFactor = dpiX / 96.0;
+                ScaleFactor = dpiX / 96.0;
             }
 
-            if (!MultiMonitorSupport || monitor == (IntPtr)PRIMARY_MONITOR)
+            if (!s_multiMonitorSupport || monitor == (IntPtr)PrimaryMonitor)
             {
                 var size = new Size(
                     NativeMethods.GetSystemMetrics(NativeMethods.SystemMetric.SM_CXSCREEN),
                     NativeMethods.GetSystemMetrics(NativeMethods.SystemMetric.SM_CYSCREEN));
 
-                this.Bounds = new Rect(0, 0, size.Width, size.Height);
-                this.Primary = true;
-                this.DeviceName = "DISPLAY";
+                Bounds = new Rect(0, 0, size.Width, size.Height);
+                Primary = true;
+                DeviceName = "DISPLAY";
             }
             else
             {
@@ -113,16 +110,16 @@ namespace MVVMToolKit.Helper.ScreenHelper
 
                 NativeMethods.GetMonitorInfo(new HandleRef(null, monitor), info);
 
-                this.Bounds = new Rect(
+                Bounds = new Rect(
                     info.rcMonitor.left,
                     info.rcMonitor.top,
                     info.rcMonitor.right - info.rcMonitor.left,
                     info.rcMonitor.bottom - info.rcMonitor.top);
-                this.Primary = (info.dwFlags & MONITORINFOF_PRIMARY) != 0;
-                this.DeviceName = new string(info.szDevice).TrimEnd((char)0);
+                Primary = (info.dwFlags & MonitorInfofPrimary) != 0;
+                DeviceName = new string(info.szDevice).TrimEnd((char)0);
             }
 
-            this.monitorHandle = monitor;
+            _monitorHandle = monitor;
         }
 
         /// <summary>
@@ -133,7 +130,7 @@ namespace MVVMToolKit.Helper.ScreenHelper
         {
             get
             {
-                if (MultiMonitorSupport)
+                if (s_multiMonitorSupport)
                 {
                     var closure = new MonitorEnumCallback();
                     var proc = new NativeMethods.MonitorEnumProc(closure.Callback);
@@ -144,7 +141,7 @@ namespace MVVMToolKit.Helper.ScreenHelper
                     }
                 }
 
-                return new Screen?[] { new Screen((IntPtr)PRIMARY_MONITOR) };
+                return new Screen?[] { new((IntPtr)PrimaryMonitor) };
             }
         }
 
@@ -156,7 +153,7 @@ namespace MVVMToolKit.Helper.ScreenHelper
         {
             get
             {
-                return MultiMonitorSupport ? AllScreens.FirstOrDefault(t => t != null && t.Primary) : new Screen((IntPtr)PRIMARY_MONITOR);
+                return s_multiMonitorSupport ? AllScreens.FirstOrDefault(t => t != null && t.Primary) : new Screen((IntPtr)PrimaryMonitor);
             }
         }
 
@@ -165,13 +162,13 @@ namespace MVVMToolKit.Helper.ScreenHelper
         /// </summary>
         /// <returns>A <see cref="T:System.Windows.Rect" />, representing the bounds of the display in units.</returns>
         public Rect WpfBounds =>
-            this.ScaleFactor.Equals(1.0)
-                ? this.Bounds
+            ScaleFactor.Equals(1.0)
+                ? Bounds
                 : new Rect(
-                    this.Bounds.X / this.ScaleFactor,
-                    this.Bounds.Y / this.ScaleFactor,
-                    this.Bounds.Width / this.ScaleFactor,
-                    this.Bounds.Height / this.ScaleFactor);
+                    Bounds.X / ScaleFactor,
+                    Bounds.Y / ScaleFactor,
+                    Bounds.Width / ScaleFactor,
+                    Bounds.Height / ScaleFactor);
 
         /// <summary>
         /// Gets the device name associated with a display.
@@ -208,7 +205,7 @@ namespace MVVMToolKit.Helper.ScreenHelper
             {
                 Rect workingArea;
 
-                if (!MultiMonitorSupport || this.monitorHandle == (IntPtr)PRIMARY_MONITOR)
+                if (!s_multiMonitorSupport || _monitorHandle == (IntPtr)PrimaryMonitor)
                 {
                     var rc = new NativeMethods.RECT();
 
@@ -219,7 +216,7 @@ namespace MVVMToolKit.Helper.ScreenHelper
                 else
                 {
                     var info = new NativeMethods.MONITORINFOEX();
-                    NativeMethods.GetMonitorInfo(new HandleRef(null, this.monitorHandle), info);
+                    NativeMethods.GetMonitorInfo(new HandleRef(null, _monitorHandle), info);
 
                     workingArea = new Rect(info.rcWork.left, info.rcWork.top, info.rcWork.right - info.rcWork.left, info.rcWork.bottom - info.rcWork.top);
                 }
@@ -234,13 +231,13 @@ namespace MVVMToolKit.Helper.ScreenHelper
         /// </summary>
         /// <returns>A <see cref="T:System.Windows.Rect" />, representing the working area of the display in units.</returns>
         public Rect WpfWorkingArea =>
-            this.ScaleFactor.Equals(1.0)
-                ? this.WorkingArea
+            ScaleFactor.Equals(1.0)
+                ? WorkingArea
                 : new Rect(
-                    this.WorkingArea.X / this.ScaleFactor,
-                    this.WorkingArea.Y / this.ScaleFactor,
-                    this.WorkingArea.Width / this.ScaleFactor,
-                    this.WorkingArea.Height / this.ScaleFactor);
+                    WorkingArea.X / ScaleFactor,
+                    WorkingArea.Y / ScaleFactor,
+                    WorkingArea.Width / ScaleFactor,
+                    WorkingArea.Height / ScaleFactor);
 
         /// <summary>
         /// Retrieves a Screen for the display that contains the largest portion of the specified control.
@@ -252,9 +249,9 @@ namespace MVVMToolKit.Helper.ScreenHelper
         /// </returns>
         public static Screen FromHandle(IntPtr hwnd)
         {
-            return MultiMonitorSupport
+            return s_multiMonitorSupport
                        ? new Screen(NativeMethods.MonitorFromWindow(new HandleRef(null, hwnd), 2))
-                       : new Screen((IntPtr)PRIMARY_MONITOR);
+                       : new Screen((IntPtr)PrimaryMonitor);
         }
 
         /// <summary>
@@ -267,13 +264,13 @@ namespace MVVMToolKit.Helper.ScreenHelper
         /// </returns>
         public static Screen FromPoint(Point point)
         {
-            if (MultiMonitorSupport)
+            if (s_multiMonitorSupport)
             {
                 var pt = new NativeMethods.POINTSTRUCT((int)point.X, (int)point.Y);
                 return new Screen(NativeMethods.MonitorFromPoint(pt, NativeMethods.MonitorDefault.MONITOR_DEFAULTTONEAREST));
             }
 
-            return new Screen((IntPtr)PRIMARY_MONITOR);
+            return new Screen((IntPtr)PrimaryMonitor);
         }
 
         /// <summary>
@@ -298,7 +295,7 @@ namespace MVVMToolKit.Helper.ScreenHelper
         {
             if (obj is Screen monitor)
             {
-                if (this.monitorHandle == monitor.monitorHandle)
+                if (_monitorHandle == monitor._monitorHandle)
                 {
                     return true;
                 }
@@ -313,20 +310,20 @@ namespace MVVMToolKit.Helper.ScreenHelper
         /// <returns>A hash code for an object.</returns>
         public override int GetHashCode()
         {
-            return this.monitorHandle.GetHashCode();
+            return _monitorHandle.GetHashCode();
         }
 
         /// <summary>
         /// The monitor enum callback.
         /// </summary>
-        private class MonitorEnumCallback
+        private sealed class MonitorEnumCallback
         {
             /// <summary>
             /// Initializes a new instance of the <see cref="MonitorEnumCallback"/> class.
             /// </summary>
             public MonitorEnumCallback()
             {
-                this.Screens = new ArrayList();
+                Screens = new ArrayList();
             }
 
             /// <summary>
@@ -344,7 +341,7 @@ namespace MVVMToolKit.Helper.ScreenHelper
             /// <returns>The bool</returns>
             public bool Callback(IntPtr monitor, IntPtr hdc, IntPtr lprcMonitor, IntPtr lparam)
             {
-                this.Screens.Add(new Screen(monitor, hdc));
+                Screens.Add(new Screen(monitor, hdc));
                 return true;
             }
         }

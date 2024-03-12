@@ -6,22 +6,22 @@ using System.Windows.Media;
 
 namespace MVVMToolKit.AttachedProperties
 {
-    public class ItemsControlExtension
+    public static class ItemsControlExtension
     {
         public static readonly DependencyProperty IsAutoScrollProperty = DependencyProperty.RegisterAttached("IsAutoScroll", typeof(bool), typeof(ItemsControlExtension), new(IsAutoScrollPropertyChanged));
 
-        public static object GetIsAutoScroll(ItemsControl target)
+        private static object GetIsAutoScroll(ItemsControl target)
 => target.GetValue(IsAutoScrollProperty);
 
         public static void SetIsAutoScroll(ItemsControl target, object value) =>
             target.SetValue(IsAutoScrollProperty, value);
 
-        private static ItemsControl? _associatedObject;
-        private static ScrollViewer? _scrollViewer;
+        private static ItemsControl? s_associatedObject;
+        private static ScrollViewer? s_scrollViewer;
 
-        private static bool _autoScroll = true;
-        private static bool _justWheeled;
-        private static bool _userInteracting;
+        private static bool s_autoScroll = true;
+        private static bool s_justWheeled;
+        private static bool s_userInteracting;
 
         private static ScrollViewer? GetScrollViewer(DependencyObject root)
         {
@@ -45,86 +45,86 @@ namespace MVVMToolKit.AttachedProperties
 
         private static void OnAttached()
         {
-            if (_associatedObject == null) return;
-            _associatedObject.Loaded += AssociatedObjectOnLoaded;
-            _associatedObject.Unloaded += AssociatedObjectOnUnloaded;
+            if (s_associatedObject == null) return;
+            s_associatedObject.Loaded += AssociatedObjectOnLoaded;
+            s_associatedObject.Unloaded += AssociatedObjectOnUnloaded;
         }
 
         private static void AssociatedObjectOnUnloaded(object sender, RoutedEventArgs e)
         {
-            if (_associatedObject == null) return;
+            if (s_associatedObject == null) return;
 
-            if (_scrollViewer != null)
+            if (s_scrollViewer != null)
             {
-                _scrollViewer.ScrollChanged -= ScrollViewerOnScrollChanged;
+                s_scrollViewer.ScrollChanged -= ScrollViewerOnScrollChanged;
             }
 
-            if (_associatedObject is ListBox listBox)
+            if (s_associatedObject is ListBox listBox)
             {
                 listBox.SelectionChanged -= ListBoxOnSelectionChanged;
             }
-            _associatedObject.ItemContainerGenerator.ItemsChanged -= ItemContainerGeneratorOnItemsChanged;
-            _associatedObject.GotMouseCapture -= ItemsControlOnGotMouseCapture;
-            _associatedObject.LostMouseCapture -= ItemsControlOnLostMouseCapture;
-            _associatedObject.PreviewMouseWheel -= ItemsControlOnPreviewMouseWheel;
+            s_associatedObject.ItemContainerGenerator.ItemsChanged -= ItemContainerGeneratorOnItemsChanged;
+            s_associatedObject.GotMouseCapture -= ItemsControlOnGotMouseCapture;
+            s_associatedObject.LostMouseCapture -= ItemsControlOnLostMouseCapture;
+            s_associatedObject.PreviewMouseWheel -= ItemsControlOnPreviewMouseWheel;
 
-            _scrollViewer = null;
+            s_scrollViewer = null;
         }
 
         private static void AssociatedObjectOnLoaded(object sender, RoutedEventArgs e)
         {
-            if (_associatedObject == null) return;
+            if (s_associatedObject == null) return;
 
-            _scrollViewer = GetScrollViewer(_associatedObject);
+            s_scrollViewer = GetScrollViewer(s_associatedObject);
 
-            if (_scrollViewer != null)
+            if (s_scrollViewer != null)
             {
-                _scrollViewer.ScrollChanged += ScrollViewerOnScrollChanged;
+                s_scrollViewer.ScrollChanged += ScrollViewerOnScrollChanged;
             }
 
-            if (_associatedObject is ListBox listBox)
+            if (s_associatedObject is ListBox listBox)
             {
                 listBox.SelectionChanged += ListBoxOnSelectionChanged;
             }
-            _associatedObject.ItemContainerGenerator.ItemsChanged += ItemContainerGeneratorOnItemsChanged;
-            _associatedObject.GotMouseCapture += ItemsControlOnGotMouseCapture;
-            _associatedObject.LostMouseCapture += ItemsControlOnLostMouseCapture;
-            _associatedObject.PreviewMouseWheel += ItemsControlOnPreviewMouseWheel;
+            s_associatedObject.ItemContainerGenerator.ItemsChanged += ItemContainerGeneratorOnItemsChanged;
+            s_associatedObject.GotMouseCapture += ItemsControlOnGotMouseCapture;
+            s_associatedObject.LostMouseCapture += ItemsControlOnLostMouseCapture;
+            s_associatedObject.PreviewMouseWheel += ItemsControlOnPreviewMouseWheel;
         }
 
         private static void IsAutoScrollPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (d is not ItemsControl itemsControl) return;
-            if (e.NewValue is not bool isAutoScroll) return;
-            if (_associatedObject == null)
+
+            if (s_associatedObject == null)
             {
-                _associatedObject = itemsControl;
+                s_associatedObject = itemsControl;
                 OnAttached();
 
             }
         }
 
-        private static void ListBoxOnSelectionChanged(object sender, SelectionChangedEventArgs e) => _autoScroll = false;
+        private static void ListBoxOnSelectionChanged(object sender, SelectionChangedEventArgs e) => s_autoScroll = false;
 
-        private static void ItemsControlOnPreviewMouseWheel(object sender, MouseWheelEventArgs e) => _justWheeled = true;
+        private static void ItemsControlOnPreviewMouseWheel(object sender, MouseWheelEventArgs e) => s_justWheeled = true;
 
-        private static void ItemsControlOnLostMouseCapture(object sender, MouseEventArgs e) => _userInteracting = false;
+        private static void ItemsControlOnLostMouseCapture(object sender, MouseEventArgs e) => s_userInteracting = false;
 
         private static void ItemsControlOnGotMouseCapture(object sender, MouseEventArgs e)
         {
-            _userInteracting = true;
-            _autoScroll = false;
+            s_userInteracting = true;
+            s_autoScroll = false;
         }
 
         private static void ItemContainerGeneratorOnItemsChanged(object sender, ItemsChangedEventArgs e)
         {
             if (e.Action != NotifyCollectionChangedAction.Add &&
                 e.Action != NotifyCollectionChangedAction.Reset) return;
-            if (_associatedObject == null) return;
-            if (GetIsAutoScroll(_associatedObject) is bool isAutoScroll)
+            if (s_associatedObject == null) return;
+            if (GetIsAutoScroll(s_associatedObject) is bool isAutoScroll)
             {
-                if (!_autoScroll || _userInteracting || !isAutoScroll) return;
-                _scrollViewer?.ScrollToBottom();
+                if (!s_autoScroll || s_userInteracting || !isAutoScroll) return;
+                s_scrollViewer?.ScrollToBottom();
 
             }
         }
@@ -132,21 +132,21 @@ namespace MVVMToolKit.AttachedProperties
         private static void ScrollViewerOnScrollChanged(object sender, ScrollChangedEventArgs e)
         {
 
-            if (_scrollViewer == null) return;
-            double diff = (_scrollViewer.VerticalOffset - (_scrollViewer.ExtentHeight - _scrollViewer.ViewportHeight));
+            if (s_scrollViewer == null) return;
+            double diff = (s_scrollViewer.VerticalOffset - (s_scrollViewer.ExtentHeight - s_scrollViewer.ViewportHeight));
 
 
-            if (_justWheeled && diff != 0.0)
+            if (s_justWheeled && diff != 0.0)
             {
-                _justWheeled = false;
-                _autoScroll = false;
+                s_justWheeled = false;
+                s_autoScroll = false;
                 return;
             }
 
             if (diff == 0.0)
             {
 
-                _autoScroll = true;
+                s_autoScroll = true;
             }
         }
     }

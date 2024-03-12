@@ -29,9 +29,9 @@ namespace MVVMToolKit.Hosting.Internal
         {
             if (item is IDisposable disposable)
             {
-                lock (this._lock)
+                lock (_lock)
                 {
-                    this._disposables.Add(disposable);
+                    _disposables.Add(disposable);
                 }
             }
         }
@@ -45,9 +45,9 @@ namespace MVVMToolKit.Hosting.Internal
             bool ret = false;
             if (item is IDisposable disposable)
             {
-                lock (this._lock)
+                lock (_lock)
                 {
-                    ret = this._disposables.Remove(disposable);
+                    ret = _disposables.Remove(disposable);
                 }
             }
             return ret;
@@ -57,20 +57,20 @@ namespace MVVMToolKit.Hosting.Internal
         /// </summary>
         public void Dispose()
         {
-            lock (this._lock)
+            lock (_lock)
             {
-                if (this._disposed)
+                if (_disposed)
                 {
                     return;
                 }
 
-                this._disposed = true;
-                for (var i = this._disposables.Count - 1; i >= 0; i--)
+                _disposed = true;
+                for (var i = _disposables.Count - 1; i >= 0; i--)
                 {
-                    var disposable = this._disposables[i];
+                    var disposable = _disposables[i];
                     disposable.Dispose();
                 }
-                this._disposables.Clear();
+                _disposables.Clear();
             }
         }
     }

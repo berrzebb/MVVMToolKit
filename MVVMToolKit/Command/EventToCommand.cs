@@ -93,8 +93,8 @@ namespace MVVMToolKit.Command
         /// </summary>
         public ICommand Command
         {
-            get => (ICommand)this.GetValue(CommandProperty);
-            set => this.SetValue(CommandProperty, value);
+            get => (ICommand)GetValue(CommandProperty);
+            set => SetValue(CommandProperty, value);
         }
 
         /// <summary>
@@ -102,8 +102,8 @@ namespace MVVMToolKit.Command
         /// </summary>
         public object? CommandParameter
         {
-            get => this.GetValue(CommandParameterProperty);
-            set => this.SetValue(CommandParameterProperty, value);
+            get => GetValue(CommandParameterProperty);
+            set => SetValue(CommandParameterProperty, value);
         }
 
         /// <summary>
@@ -116,9 +116,9 @@ namespace MVVMToolKit.Command
         /// </summary>
         public bool MustToggleIsEnabled
         {
-            get => (bool)this.GetValue(MustToggleIsEnabledProperty);
+            get => (bool)GetValue(MustToggleIsEnabledProperty);
 
-            set => this.SetValue(MustToggleIsEnabledProperty, value);
+            set => SetValue(MustToggleIsEnabledProperty, value);
         }
 
         /// <summary>
@@ -128,8 +128,8 @@ namespace MVVMToolKit.Command
         /// </summary>
         public object EventArgsConverterParameter
         {
-            get => this.GetValue(EventArgsConverterParameterProperty);
-            set => this.SetValue(EventArgsConverterParameterProperty, value);
+            get => GetValue(EventArgsConverterParameterProperty);
+            set => SetValue(EventArgsConverterParameterProperty, value);
         }
 
         /// <summary>
@@ -138,8 +138,8 @@ namespace MVVMToolKit.Command
         /// </summary>
         public bool AlwaysInvokeCommand
         {
-            get => (bool)this.GetValue(AlwaysInvokeCommandProperty);
-            set => this.SetValue(AlwaysInvokeCommandProperty, value);
+            get => (bool)GetValue(AlwaysInvokeCommandProperty);
+            set => SetValue(AlwaysInvokeCommandProperty, value);
         }
 
         /// <summary>
@@ -160,27 +160,27 @@ namespace MVVMToolKit.Command
         protected override void OnAttached()
         {
             base.OnAttached();
-            this.EnableDisableElement();
+            EnableDisableElement();
         }
 
         public void Invoke()
         {
-            this.Invoke(null);
+            Invoke(null);
         }
 
         protected override void Invoke(object? parameter)
         {
-            if (this.AssociatedElementIsDisabled() && !this.AlwaysInvokeCommand)
+            if (AssociatedElementIsDisabled() && !AlwaysInvokeCommand)
             {
                 return;
             }
 
-            var command = this.Command;
-            var commandParameter = this.CommandParameter;
+            var command = Command;
+            var commandParameter = CommandParameter;
 
-            if (this.PassEventArgsToCommand)
+            if (PassEventArgsToCommand)
             {
-                commandParameter = this.EventArgsConverter?.Convert(parameter, this.EventArgsConverterParameter) ??
+                commandParameter = EventArgsConverter?.Convert(parameter, EventArgsConverterParameter) ??
                                    parameter;
             }
 
@@ -214,31 +214,31 @@ namespace MVVMToolKit.Command
         }
         private bool AssociatedElementIsDisabled()
         {
-            var element = this.AssociatedObject as FrameworkElement;
+            var element = AssociatedObject as FrameworkElement;
 
             return element is null or { IsEnabled: false };
         }
 
         private void EnableDisableElement()
         {
-            var element = this.AssociatedObject as FrameworkElement;
+            var element = AssociatedObject as FrameworkElement;
 
             if (element == null)
             {
                 return;
             }
 
-            var command = this.Command;
+            var command = Command;
 
-            if (this.MustToggleIsEnabled)
+            if (MustToggleIsEnabled)
             {
-                element.IsEnabled = command.CanExecute(this.CommandParameter);
+                element.IsEnabled = command.CanExecute(CommandParameter);
             }
         }
 
         private void OnCommandCanExecuteChanged(object? sender, EventArgs? e)
         {
-            this.EnableDisableElement();
+            EnableDisableElement();
         }
     }
 }

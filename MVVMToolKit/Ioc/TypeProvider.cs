@@ -9,9 +9,9 @@ namespace MVVMToolKit.Ioc
 
         public TypeInfo(string? name, string? fullName, Type actualType)
         {
-            this.Name = name;
-            this.FullName = fullName;
-            this.ActualType = actualType;
+            Name = name;
+            FullName = fullName;
+            ActualType = actualType;
         }
 
         /// <inheritdoc />

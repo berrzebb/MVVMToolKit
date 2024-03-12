@@ -12,11 +12,11 @@ namespace MVVMToolKit.Threading.UI
 
         }
 
-        public DispatcherService(Dispatcher dispatcher) => this._dispatcher = dispatcher;
+        public DispatcherService(Dispatcher dispatcher) => _dispatcher = dispatcher;
 
-        public bool CheckAccess() => this._dispatcher.CheckAccess();
+        public bool CheckAccess() => _dispatcher.CheckAccess();
 
-        public void VerifyAccess() => this._dispatcher.VerifyAccess();
+        public void VerifyAccess() => _dispatcher.VerifyAccess();
 
         public void Invoke(Action? callback, DispatcherPriority? priority = null,
                            CancellationToken? cancellationToken = null, TimeSpan? timeout = null)
@@ -30,7 +30,7 @@ namespace MVVMToolKit.Threading.UI
                 CancellationToken token = cancellationToken ?? CancellationToken.None;
                 TimeSpan milliseconds = timeout ?? TimeSpan.FromMilliseconds(-1);
 
-                this._dispatcher.Invoke(callback, dispatcherPriority, token, milliseconds);
+                _dispatcher.Invoke(callback, dispatcherPriority, token, milliseconds);
             }
         }
 
@@ -45,7 +45,7 @@ namespace MVVMToolKit.Threading.UI
             CancellationToken token = cancellationToken ?? CancellationToken.None;
             TimeSpan milliseconds = timeout ?? TimeSpan.FromMilliseconds(-1);
 
-            return this._dispatcher.Invoke(callback, dispatcherPriority, token, milliseconds);
+            return _dispatcher.Invoke(callback, dispatcherPriority, token, milliseconds);
         }
 
         public DispatcherOperation InvokeAsync(Action? callback, DispatcherPriority? priority = null,
@@ -54,7 +54,7 @@ namespace MVVMToolKit.Threading.UI
             DispatcherPriority dispatcherPriority = priority ?? DispatcherPriority.Normal;
             CancellationToken token = cancellationToken ?? CancellationToken.None;
 
-            return this._dispatcher.InvokeAsync(callback, dispatcherPriority, token);
+            return _dispatcher.InvokeAsync(callback, dispatcherPriority, token);
         }
 
         public DispatcherOperation<TResult> InvokeAsync<TResult>(Func<TResult>? callback,
@@ -63,7 +63,7 @@ namespace MVVMToolKit.Threading.UI
             DispatcherPriority dispatcherPriority = priority ?? DispatcherPriority.Normal;
             CancellationToken token = cancellationToken ?? CancellationToken.None;
 
-            return this._dispatcher.InvokeAsync(callback, dispatcherPriority, token);
+            return _dispatcher.InvokeAsync(callback, dispatcherPriority, token);
         }
     }
 }

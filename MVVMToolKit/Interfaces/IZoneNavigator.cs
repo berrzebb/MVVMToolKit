@@ -7,11 +7,11 @@
 
         public NavigationResult(bool isSuccess = true, string reason = "")
         {
-            this.IsSuccess = isSuccess;
-            this.Reason = reason;
+            IsSuccess = isSuccess;
+            Reason = reason;
         }
     }
-    public interface IViewNavigator
+    public interface IZoneNavigator
     {
         NavigationResult Navigate(string zoneName, object routeKey, Type? contextType = null);
     }

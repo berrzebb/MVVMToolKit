@@ -1,4 +1,4 @@
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 
 namespace MVVMToolKit.ViewModels
 {
@@ -22,7 +22,7 @@ namespace MVVMToolKit.ViewModels
         /// <summary>
         /// The value.
         /// </summary>
-        private T value;
+        private T _value;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NotifyObject{T}"/> class.
@@ -30,7 +30,7 @@ namespace MVVMToolKit.ViewModels
         /// <param name="initialValue">The initial value.</param>
         public NotifyObject(T initialValue = default!)
         {
-            this.value = initialValue;
+            _value = initialValue;
         }
 
         /// <summary>
@@ -38,14 +38,14 @@ namespace MVVMToolKit.ViewModels
         /// </summary>
         public T Value
         {
-            get => this.value;
+            get => _value;
             set
             {
-                if (!EqualityComparer<T>.Default.Equals(this.value, value))
+                if (!EqualityComparer<T>.Default.Equals(this._value, value))
                 {
-                    this.OnPropertyChanging(nameof(this.Value));
-                    this.value = value;
-                    this.OnPropertyChanged(nameof(this.Value));
+                    OnPropertyChanging();
+                    this._value = value;
+                    OnPropertyChanged();
                 }
             }
         }
