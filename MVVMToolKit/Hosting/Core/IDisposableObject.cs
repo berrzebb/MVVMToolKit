@@ -1,4 +1,4 @@
-namespace MVVMToolKit.Hosting.Core
+﻿namespace MVVMToolKit.Hosting.Core
 {
     /// <summary>
     /// The disposable object interface.

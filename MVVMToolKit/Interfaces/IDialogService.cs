@@ -3,8 +3,9 @@ using MVVMToolKit.Templates;
 
 namespace MVVMToolKit.Interfaces
 {
+
     /// <summary>
-    /// The popup service interface
+    /// 팝업 다이얼로그 서비스.
     /// </summary>
     public interface IDialogService
     {
@@ -26,29 +27,8 @@ namespace MVVMToolKit.Interfaces
         /// 팝업 컨텐츠 설정
         /// </summary>
         /// <param name="viewModel">컨텐츠에서 사용할 ViewModel</param>
-        /// <param name="title">팝업 타이틀.</param>
-        /// <param name="width">팝업 크기.</param>
-        /// <param name="height">팝업 크기.</param>
-        /// <param name="hostType">팝업창 호스트 타입</param>
-        /// <param name="isModal">Modal 여부</param>
-        IPopupContext CreateDialog(INotifyPropertyChanged viewModel, string? title, double width, double height, string hostType,
-            bool isModal = true);
-
-
-        /// <summary>
-        /// 팝업 컨텐츠 설정
-        /// </summary>
-        /// <param name="viewModel">컨텐츠에서 사용할 ViewModel</param>
         /// <param name="options">팝업창 설정</param>
         IPopupContext CreateDialog(INotifyPropertyChanged viewModel, PopupOption options);
-
-        /// <summary>
-        /// 팝업 컨텐츠 설정
-        /// </summary>
-
-        /// <summary>
-        /// 팝업 컨텐츠 설정
-        /// </summary>
 
     }
 }

@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿
+
+using System.IO;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Xml;
@@ -74,7 +76,8 @@ namespace MVVMToolKit.Helper
             try
             {
                 using StringReader stringReader = new(xmlData);
-                using XmlTextReader xmlReader = new(stringReader);
+
+                using XmlTextReader xmlReader = (XmlTextReader)XmlReader.Create(stringReader);
                 XmlSerializer serializer = new(typeof(T));
                 return serializer.Deserialize(xmlReader) as T;
             }

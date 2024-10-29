@@ -1,4 +1,4 @@
-using MVVMToolKit.Helper.Native;
+﻿using MVVMToolKit.Helper.Native;
 
 namespace MVVMToolKit.Helper
 {

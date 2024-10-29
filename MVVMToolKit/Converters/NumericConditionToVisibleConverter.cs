@@ -1,3 +1,6 @@
+﻿
+
+
 using System.Globalization;
 using System.Windows.Data;
 using MVVMToolKit.Hosting.Extensions;
@@ -7,7 +10,7 @@ namespace MVVMToolKit.Converters
     /// <summary>
     /// 숫자 비교 연산자를 나타내는 열거형입니다.
     /// </summary>
-    public enum OpType : int
+    public enum OpType
     {
         /// <summary>
         /// 동일함을 나타냅니다.

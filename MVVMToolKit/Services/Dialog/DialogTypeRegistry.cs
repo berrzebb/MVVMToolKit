@@ -10,7 +10,7 @@ namespace MVVMToolKit.Services.Dialog
 
         internal static void RegisterDialog(string dialogKey, Type type)
         {
-            dialogTypes.AddOrUpdate(dialogKey, type, (_, _) => type);
+            _ = dialogTypes.AddOrUpdate(dialogKey, type, (_, _) => type);
         }
 
         private static bool Dialog(string name, out Type? type) => dialogTypes.TryGetValue(name, out type);
@@ -20,7 +20,10 @@ namespace MVVMToolKit.Services.Dialog
             {
                 return null;
             }
-            if (registeredType == null) return null;
+
+            if (registeredType == null)
+                return null;
+
             PopupWindow? dialogWindow;
             if (isDependencyInjection)
             {
@@ -30,6 +33,7 @@ namespace MVVMToolKit.Services.Dialog
             {
                 dialogWindow = (PopupWindow?)Activator.CreateInstance(registeredType);
             }
+
             return dialogWindow;
         }
     }

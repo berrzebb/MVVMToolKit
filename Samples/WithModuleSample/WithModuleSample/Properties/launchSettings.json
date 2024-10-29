@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "WithModuleSample": {
-      "commandName": "Project",
-      "nativeDebugging": true
-    }
-  }
-}

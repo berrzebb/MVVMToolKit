@@ -1,10 +1,10 @@
-using System.Runtime.InteropServices;
+ï»¿using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 
 namespace MVVMToolKit.Helper.Native
 {
     /// <summary>
-    /// ¿ÜºÎ DLL ÆÄÀÏÀÇ ÇÔ¼ö¸¦ È£ÃâÇÏ±â À§ÇÑ ¸Ş¼­µå¿Í ¿­°ÅÇüÀ» Á¤ÀÇÇÏ´Â Å¬·¡½ºÀÔ´Ï´Ù.<br/>
+    /// ì™¸ë¶€ DLL íŒŒì¼ì˜ í•¨ìˆ˜ë¥¼ í˜¸ì¶œí•˜ê¸° ìœ„í•œ ë©”ì„œë“œì™€ ì—´ê±°í˜•ì„ ì •ì˜í•˜ëŠ” í´ë˜ìŠ¤ì…ë‹ˆë‹¤.<br/>
     /// </summary>
     public static class NativeMethods
     {

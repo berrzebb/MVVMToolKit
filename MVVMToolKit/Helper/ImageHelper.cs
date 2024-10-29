@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -8,7 +8,7 @@ namespace MVVMToolKit.Helper
     /// <summary>
     /// The image helper class
     /// </summary>
-    public class ImageHelper
+    public static class ImageHelper
     {
         /// <summary>
         /// Creates the bitmap image using the specified path
@@ -18,7 +18,6 @@ namespace MVVMToolKit.Helper
         /// <returns>The bitmap</returns>
         public static BitmapImage? CreateBitmapImage(string path, int decodePixelWidth = 300)
         {
-            string imageFile = Path.GetFileName(path);
             if (!File.Exists(path))
             {
                 return null;
@@ -64,7 +63,7 @@ namespace MVVMToolKit.Helper
         /// <returns>The bool</returns>
         public static bool SetImageForImage(Image imageControl, string path, bool isLocalDownloadFile = true, int decodePixelWidth = 300)
         {
-            BitmapImage? bitmapImg = null;
+            BitmapImage? bitmapImg;
             if (isLocalDownloadFile)
             {
                 bitmapImg = CreateBitmapImage(path, decodePixelWidth);
@@ -79,6 +78,7 @@ namespace MVVMToolKit.Helper
                 bitmapImg.UriSource = new Uri(path, UriKind.RelativeOrAbsolute);
                 bitmapImg.EndInit();
             }
+
             if (bitmapImg == null)
             {
                 if (string.IsNullOrWhiteSpace(path))
@@ -122,7 +122,7 @@ namespace MVVMToolKit.Helper
         /// <returns>The color</returns>
         public static Color GetAverageColor(BitmapSource bitmap)
         {
-            var format = bitmap.Format;
+            PixelFormat format = bitmap.Format;
 
             if (format != PixelFormats.Bgr24 &&
                 format != PixelFormats.Bgr32 &&
@@ -132,11 +132,11 @@ namespace MVVMToolKit.Helper
                 throw new InvalidOperationException("BitmapSource must have Bgr24, Bgr32, Bgra32 or Pbgra32 format");
             }
 
-            var width = bitmap.PixelWidth;
-            var height = bitmap.PixelHeight;
-            var numPixels = width * height;
-            var bytesPerPixel = format.BitsPerPixel / 8;
-            var pixelBuffer = new byte[numPixels * bytesPerPixel];
+            int width = bitmap.PixelWidth;
+            int height = bitmap.PixelHeight;
+            int numPixels = width * height;
+            int bytesPerPixel = format.BitsPerPixel / 8;
+            byte[] pixelBuffer = new byte[numPixels * bytesPerPixel];
 
             bitmap.CopyPixels(pixelBuffer, width * bytesPerPixel, 0);
 

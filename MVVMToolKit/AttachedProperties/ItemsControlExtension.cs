@@ -1,27 +1,44 @@
 ﻿using System.Collections.Specialized;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
+using MVVMToolKit.Comparers;
 
 namespace MVVMToolKit.AttachedProperties
 {
+    /// <summary>
+    /// ItemsControl의 확장 메서드입니다.
+    /// </summary>
     public static class ItemsControlExtension
     {
+        /// <summary>
+        /// 자동 스크롤 여부.
+        /// </summary>
         public static readonly DependencyProperty IsAutoScrollProperty = DependencyProperty.RegisterAttached("IsAutoScroll", typeof(bool), typeof(ItemsControlExtension), new(IsAutoScrollPropertyChanged));
 
-        private static object GetIsAutoScroll(ItemsControl target)
+        /// <summary>
+        /// 자동으로 스크롤 될지 여부의 값을 가져옵니다.
+        /// </summary>
+        /// <param name="target">가져올 객체</param>
+        /// <returns>자동으로 스크롤 되는지 여부</returns>
+        public static object? GetIsAutoScroll(ItemsControl target)
 => target.GetValue(IsAutoScrollProperty);
 
-        public static void SetIsAutoScroll(ItemsControl target, object value) =>
-            target.SetValue(IsAutoScrollProperty, value);
+        /// <summary>
+        /// 자동으로 스크롤 될지 여부를 설정합니다.
+        /// </summary>
+        /// <param name="target">설정할 객체</param>
+        /// <param name="value">자동으로 스크롤 되는지 여부</param>
+        public static void SetIsAutoScroll(ItemsControl target, object value) => target.SetValue(IsAutoScrollProperty, value);
 
-        private static ItemsControl? s_associatedObject;
-        private static ScrollViewer? s_scrollViewer;
+        private static ItemsControl? sAssociatedObject;
+        private static ScrollViewer? sScrollViewer;
 
-        private static bool s_autoScroll = true;
-        private static bool s_justWheeled;
-        private static bool s_userInteracting;
+        private static bool sAutoScroll = true;
+        private static bool sJustWheeled;
+        private static bool sUserInteracting;
 
         private static ScrollViewer? GetScrollViewer(DependencyObject root)
         {
@@ -40,91 +57,104 @@ namespace MVVMToolKit.AttachedProperties
                     return foundChild;
                 }
             }
+
             return null;
         }
 
         private static void OnAttached()
         {
-            if (s_associatedObject == null) return;
-            s_associatedObject.Loaded += AssociatedObjectOnLoaded;
-            s_associatedObject.Unloaded += AssociatedObjectOnUnloaded;
+            if (sAssociatedObject == null)
+                return;
+            sAssociatedObject.Loaded += AssociatedObjectOnLoaded;
+            sAssociatedObject.Unloaded += AssociatedObjectOnUnloaded;
         }
 
         private static void AssociatedObjectOnUnloaded(object sender, RoutedEventArgs e)
         {
-            if (s_associatedObject == null) return;
+            if (sAssociatedObject == null)
+                return;
 
-            if (s_scrollViewer != null)
+            if (sScrollViewer != null)
             {
-                s_scrollViewer.ScrollChanged -= ScrollViewerOnScrollChanged;
+                sScrollViewer.ScrollChanged -= ScrollViewerOnScrollChanged;
             }
 
-            if (s_associatedObject is ListBox listBox)
+            if (sAssociatedObject is ListBox listBox)
             {
                 listBox.SelectionChanged -= ListBoxOnSelectionChanged;
             }
-            s_associatedObject.ItemContainerGenerator.ItemsChanged -= ItemContainerGeneratorOnItemsChanged;
-            s_associatedObject.GotMouseCapture -= ItemsControlOnGotMouseCapture;
-            s_associatedObject.LostMouseCapture -= ItemsControlOnLostMouseCapture;
-            s_associatedObject.PreviewMouseWheel -= ItemsControlOnPreviewMouseWheel;
 
-            s_scrollViewer = null;
+            sAssociatedObject.ItemContainerGenerator.ItemsChanged -= ItemContainerGeneratorOnItemsChanged;
+            sAssociatedObject.GotMouseCapture -= ItemsControlOnGotMouseCapture;
+            sAssociatedObject.LostMouseCapture -= ItemsControlOnLostMouseCapture;
+            sAssociatedObject.PreviewMouseWheel -= ItemsControlOnPreviewMouseWheel;
+
+            sScrollViewer = null;
         }
 
         private static void AssociatedObjectOnLoaded(object sender, RoutedEventArgs e)
         {
-            if (s_associatedObject == null) return;
+            if (sAssociatedObject == null)
+                return;
 
-            s_scrollViewer = GetScrollViewer(s_associatedObject);
+            sScrollViewer = GetScrollViewer(sAssociatedObject);
 
-            if (s_scrollViewer != null)
+            if (sScrollViewer != null)
             {
-                s_scrollViewer.ScrollChanged += ScrollViewerOnScrollChanged;
+                sScrollViewer.ScrollChanged += ScrollViewerOnScrollChanged;
             }
 
-            if (s_associatedObject is ListBox listBox)
+            if (sAssociatedObject is ListBox listBox)
             {
                 listBox.SelectionChanged += ListBoxOnSelectionChanged;
             }
-            s_associatedObject.ItemContainerGenerator.ItemsChanged += ItemContainerGeneratorOnItemsChanged;
-            s_associatedObject.GotMouseCapture += ItemsControlOnGotMouseCapture;
-            s_associatedObject.LostMouseCapture += ItemsControlOnLostMouseCapture;
-            s_associatedObject.PreviewMouseWheel += ItemsControlOnPreviewMouseWheel;
+
+            sAssociatedObject.ItemContainerGenerator.ItemsChanged += ItemContainerGeneratorOnItemsChanged;
+            sAssociatedObject.GotMouseCapture += ItemsControlOnGotMouseCapture;
+            sAssociatedObject.LostMouseCapture += ItemsControlOnLostMouseCapture;
+            sAssociatedObject.PreviewMouseWheel += ItemsControlOnPreviewMouseWheel;
         }
 
         private static void IsAutoScrollPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if (d is not ItemsControl itemsControl) return;
+            if (d is not ItemsControl itemsControl)
+                return;
 
-            if (s_associatedObject == null)
+            if (sAssociatedObject == null)
             {
-                s_associatedObject = itemsControl;
+                sAssociatedObject = itemsControl;
                 OnAttached();
 
             }
         }
 
-        private static void ListBoxOnSelectionChanged(object sender, SelectionChangedEventArgs e) => s_autoScroll = false;
+        private static void ListBoxOnSelectionChanged(object sender, SelectionChangedEventArgs e) => sAutoScroll = false;
 
-        private static void ItemsControlOnPreviewMouseWheel(object sender, MouseWheelEventArgs e) => s_justWheeled = true;
+        private static void ItemsControlOnPreviewMouseWheel(object sender, MouseWheelEventArgs e) => sJustWheeled = true;
 
-        private static void ItemsControlOnLostMouseCapture(object sender, MouseEventArgs e) => s_userInteracting = false;
+        private static void ItemsControlOnLostMouseCapture(object sender, MouseEventArgs e) => sUserInteracting = false;
 
         private static void ItemsControlOnGotMouseCapture(object sender, MouseEventArgs e)
         {
-            s_userInteracting = true;
-            s_autoScroll = false;
+            sUserInteracting = true;
+            sAutoScroll = false;
         }
 
         private static void ItemContainerGeneratorOnItemsChanged(object sender, ItemsChangedEventArgs e)
         {
-            if (e.Action != NotifyCollectionChangedAction.Add &&
-                e.Action != NotifyCollectionChangedAction.Reset) return;
-            if (s_associatedObject == null) return;
-            if (GetIsAutoScroll(s_associatedObject) is bool isAutoScroll)
+            if (e.Action is
+                not NotifyCollectionChangedAction.Add
+                and
+                not NotifyCollectionChangedAction.Reset)
+                return;
+
+            if (sAssociatedObject == null)
+                return;
+            if (GetIsAutoScroll(sAssociatedObject) is bool isAutoScroll)
             {
-                if (!s_autoScroll || s_userInteracting || !isAutoScroll) return;
-                s_scrollViewer?.ScrollToBottom();
+                if (!sAutoScroll || sUserInteracting || !isAutoScroll)
+                    return;
+                sScrollViewer?.ScrollToBottom();
 
             }
         }
@@ -132,21 +162,21 @@ namespace MVVMToolKit.AttachedProperties
         private static void ScrollViewerOnScrollChanged(object sender, ScrollChangedEventArgs e)
         {
 
-            if (s_scrollViewer == null) return;
-            double diff = (s_scrollViewer.VerticalOffset - (s_scrollViewer.ExtentHeight - s_scrollViewer.ViewportHeight));
+            if (sScrollViewer == null)
+                return;
+            double diff = sScrollViewer.VerticalOffset - (sScrollViewer.ExtentHeight - sScrollViewer.ViewportHeight);
 
-
-            if (s_justWheeled && diff != 0.0)
+            if (sJustWheeled && !DoubleUtil.Equals(diff, 0.0))
             {
-                s_justWheeled = false;
-                s_autoScroll = false;
+                sJustWheeled = false;
+                sAutoScroll = false;
                 return;
             }
 
-            if (diff == 0.0)
+            if (DoubleUtil.Equals(diff, 0.0))
             {
 
-                s_autoScroll = true;
+                sAutoScroll = true;
             }
         }
     }

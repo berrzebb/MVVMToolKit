@@ -1,8 +1,9 @@
 ﻿namespace MVVMToolKit.Helper
 {
+    using System;
     internal class EndianHelper
     {
-                /// <summary>
+        /// <summary>
         ///     Convert big-endian to little-endian or reserve
         /// </summary>
         internal static byte[] ConvertEndian(byte[] i)
@@ -36,7 +37,7 @@
         /// <summary>
         ///     Convert big-endian to little-endian or reserve
         /// </summary>
-        internal static Int16 ConvertEndian(Int16 i)
+        internal static short ConvertEndian(short i)
         {
             return BitConverter.ToInt16(ConvertEndian(BitConverter.GetBytes(i)), 0);
         }
@@ -44,7 +45,7 @@
         /// <summary>
         ///     Convert big-endian to little-endian or reserve
         /// </summary>
-        internal static UInt16 ConvertEndian(UInt16 i)
+        internal static ushort ConvertEndian(ushort i)
         {
             return BitConverter.ToUInt16(ConvertEndian(BitConverter.GetBytes(i)), 0);
         }

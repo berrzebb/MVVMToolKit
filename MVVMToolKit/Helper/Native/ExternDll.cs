@@ -1,23 +1,23 @@
-namespace MVVMToolKit.Helper.Native
+ï»¿namespace MVVMToolKit.Helper.Native
 {
     /// <summary>
-    /// ¿ÜºÎ DLL ÆÄÀÏÀÇ ÀÌ¸§À» »ó¼ö·Î Á¤ÀÇÇÏ´Â Å¬·¡½ºÀÔ´Ï´Ù.<br/>
+    /// ì™¸ë¶€ DLL íŒŒì¼ì˜ ì´ë¦„ì„ ìƒìˆ˜ë¡œ ì •ì˜í•˜ëŠ” í´ëž˜ìŠ¤ìž…ë‹ˆë‹¤.<br/>
     /// </summary>
     internal class ExternDll
     {
         /// <summary>
-        /// User32.dll ÆÄÀÏÀÇ ÀÌ¸§À» ³ªÅ¸³À´Ï´Ù.<br/>
-        /// ÀÌ DLLÀº »ç¿ëÀÚ ÀÎÅÍÆäÀÌ½º¸¦ Á¦¾îÇÏ´Â Windows API ÇÔ¼ö¸¦ Æ÷ÇÔÇÏ°í ÀÖ½À´Ï´Ù.
+        /// User32.dll íŒŒì¼ì˜ ì´ë¦„ì„ ë‚˜íƒ€ëƒ…ë‹ˆë‹¤.<br/>
+        /// ì´ DLLì€ ì‚¬ìš©ìž ì¸í„°íŽ˜ì´ìŠ¤ë¥¼ ì œì–´í•˜ëŠ” Windows API í•¨ìˆ˜ë¥¼ í¬í•¨í•˜ê³  ìžˆìŠµë‹ˆë‹¤.
         /// </summary>
         public const string User32 = "user32.dll";
         /// <summary>
-        /// Shcore.dll ÆÄÀÏÀÇ ÀÌ¸§À» ³ªÅ¸³À´Ï´Ù.<br/>
-        /// ÀÌ DLLÀº °íÇØ»óµµ µð½ºÇÃ·¹ÀÌ¸¦ Áö¿øÇÏ´Â Windows API ÇÔ¼ö¸¦ Æ÷ÇÔÇÏ°í ÀÖ½À´Ï´Ù.
+        /// Shcore.dll íŒŒì¼ì˜ ì´ë¦„ì„ ë‚˜íƒ€ëƒ…ë‹ˆë‹¤.<br/>
+        /// ì´ DLLì€ ê³ í•´ìƒë„ ë””ìŠ¤í”Œë ˆì´ë¥¼ ì§€ì›í•˜ëŠ” Windows API í•¨ìˆ˜ë¥¼ í¬í•¨í•˜ê³  ìžˆìŠµë‹ˆë‹¤.
         /// </summary>
         public const string Shcore = "shcore.dll";
         /// <summary>
-        /// D2D1.dll ÆÄÀÏÀÇ ÀÌ¸§À» ³ªÅ¸³À´Ï´Ù.<br/>
-        /// ÀÌ DLLÀº 2D ±×·¡ÇÈ ·»´õ¸µÀ» À§ÇÑ Direct2D API ÇÔ¼ö¸¦ Æ÷ÇÔÇÏ°í ÀÖ½À´Ï´Ù.
+        /// D2D1.dll íŒŒì¼ì˜ ì´ë¦„ì„ ë‚˜íƒ€ëƒ…ë‹ˆë‹¤.<br/>
+        /// ì´ DLLì€ 2D ê·¸ëž˜í”½ ë Œë”ë§ì„ ìœ„í•œ Direct2D API í•¨ìˆ˜ë¥¼ í¬í•¨í•˜ê³  ìžˆìŠµë‹ˆë‹¤.
         /// </summary>
         public const string D2D1 = "d2d1.dll";
     }

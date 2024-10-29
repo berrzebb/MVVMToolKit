@@ -361,3 +361,5 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/.sonarqube/conf
+/MVVMToolKit/.sonarqube/conf

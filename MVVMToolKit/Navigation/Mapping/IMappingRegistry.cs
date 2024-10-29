@@ -1,6 +1,6 @@
 ﻿namespace MVVMToolKit.Navigation.Mapping
 {
-    public interface IMappingRegistry
+    internal interface IMappingRegistry
     {
         IMappingRegistry Register(IMappingConfiguration configuration);
     }

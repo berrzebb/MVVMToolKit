@@ -1,14 +1,27 @@
-﻿using System.Windows.Input;
+﻿
+
+using System.Windows;
+using System.Windows.Input;
 
 namespace MVVMToolKit.AttachedProperties
 {
+    /// <summary>
+    ///  Layout 확장입니다.
+    /// </summary>
     public static class LayoutExtension
     {
+        /// <summary>
+        /// 창을 이동하기 위한 속성
+        /// </summary>
         public static readonly DependencyProperty IsDragWindowProperty = DependencyProperty.RegisterAttached("IsDragWindow", typeof(bool), typeof(LayoutExtension), new PropertyMetadata(IsDragWindowPropertyChanged));
 
         private static object GetIsDragWindow(FrameworkElement target)
             => target.GetValue(IsDragWindowProperty);
-
+        /// <summary>
+        /// 창 이동 속성을 설정합니다.
+        /// </summary>
+        /// <param name="target"></param>
+        /// <param name="value"></param>
         public static void SetIsDragWindow(FrameworkElement target, object value) =>
             target.SetValue(IsDragWindowProperty, value);
 
