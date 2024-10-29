@@ -1,4 +1,6 @@
+﻿using System;
 using System.Collections;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Interop;
 using MVVMToolKit.Helper.Native;

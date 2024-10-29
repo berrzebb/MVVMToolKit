@@ -1,13 +1,17 @@
-﻿namespace MVVMToolKit.Ioc.Modules
-{
-    using System.IO;
-    using System.Reflection;
-    using Interfaces;
-    using Microsoft.Extensions.Logging;
+﻿using System.IO;
+using System.Reflection;
+using Microsoft.Extensions.Logging;
+using MVVMToolKit.Interfaces;
 
+namespace MVVMToolKit.Ioc.Modules
+{
+    /// <inheritdoc />
     public class DirectoryModuleCatalog : ModuleCatalog
     {
-
+        /// <summary>
+        /// Directory Module Catalog 생성자.
+        /// </summary>
+        /// <param name="moduleDirectory">모듈 디렉토리</param>
         public DirectoryModuleCatalog(string moduleDirectory)
         {
 

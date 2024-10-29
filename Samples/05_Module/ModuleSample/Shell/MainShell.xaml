@@ -1,0 +1,26 @@
+﻿<Window
+    x:Class="ModuleSample.MainShell"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:ModuleSample"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:zone="clr-namespace:MVVMToolKit.Navigation.Zones;assembly=MVVMToolKit"
+    Title="환율"
+    MinWidth="468"
+    MinHeight="180"
+    MaxWidth="468"
+    MaxHeight="180"
+    ResizeMode="NoResize"
+    mc:Ignorable="d">
+    <Grid ShowGridLines="True">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200" />
+            <ColumnDefinition Width="50" />
+            <ColumnDefinition Width="200" />
+        </Grid.ColumnDefinitions>
+        <ContentControl Grid.Column="0" zone:ZoneRegistry.ZoneName="UserZone" />
+        <ContentControl Grid.Column="1" zone:ZoneRegistry.ZoneName="InfoZone" />
+        <ContentControl Grid.Column="2" zone:ZoneRegistry.ZoneName="DataZone" />
+    </Grid>
+</Window>

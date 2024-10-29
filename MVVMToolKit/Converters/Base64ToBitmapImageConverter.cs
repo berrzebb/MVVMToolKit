@@ -1,3 +1,5 @@
+О╩©
+using System;
 using System.Globalization;
 using System.Windows.Data;
 using MVVMToolKit.Helper;
@@ -6,19 +8,19 @@ using MVVMToolKit.Hosting.Extensions;
 namespace MVVMToolKit.Converters
 {
     /// <summary>
-    /// Base64 ╧╝юз©╜ю╩ Bitmap юл╧лаЖ╥н ╨╞х╞го╢б да╧Жем е╛╥║╫╨ют╢о╢ы.
+    /// Base64 К╛╦Л·░Л≈╢Л²└ Bitmap Л²╢К╞╦Л╖─К║° КЁ─М≥≤М∙≤К┼■ Л╩╗К╡└М└╟ М│╢К·≤Л┼╓Л·┘К▀┬К▀╓.
     /// </summary>
     /// <seealso cref="IValueConverter"/>
     public class Base64ToBitmapImageConverter : MarkupConverterExtension<Base64ToBitmapImageConverter>
     {
         /// <summary>
-        /// аж╬НаЬ ╟╙ю╩ ╨╞х╞гу╢о╢ы.
+        /// Лё╪Л√╢Л╖└ Й╟▓Л²└ КЁ─М≥≤М∙╘К▀┬К▀╓.
         /// </summary>
-        /// <param name="value">╨╞х╞гр Base64 ╧╝юз©╜ют╢о╢ы.</param>
-        /// <param name="targetType">╢К╩С е╦ютют╢о╢ы. юл да╧Жем©║╪╜╢б ╧╚╫ц╣к╢о╢ы.</param>
-        /// <param name="parameter">╨╞х╞©║ ╩Г©Кгр цъ╟║ ╦е╟Ё╨╞╪Жют╢о╢ы. юл да╧Жем©║╪╜╢б ╧╚╫ц╣к╢о╢ы.</param>
-        /// <param name="culture">╧╝х╜╠г а╓╨╦ют╢о╢ы. юл да╧Жем©║╪╜╢б ╧╚╫ц╣к╢о╢ы.</param>
-        /// <returns>╨╞х╞╣х Bitmap юл╧лаЖ ╟╢ц╪ют╢о╢ы.</returns>
+        /// <param name="value">КЁ─М≥≤М∙═ Base64 К╛╦Л·░Л≈╢Л·┘К▀┬К▀╓.</param>
+        /// <param name="targetType">К▄─Л┐│ М┐─Л·┘Л·┘К▀┬К▀╓. Л²╢ Л╩╗К╡└М└╟Л≈░Л└°К┼■ К╛╢Л▀°К░╘К▀┬К▀╓.</param>
+        /// <param name="parameter">КЁ─М≥≤Л≈░ Л┌╛Л ╘М∙═ Л╤■Й╟─ К╖╓Й╟°КЁ─Л┬≤Л·┘К▀┬К▀╓. Л²╢ Л╩╗К╡└М└╟Л≈░Л└°К┼■ К╛╢Л▀°К░╘К▀┬К▀╓.</param>
+        /// <param name="culture">К╛╦М≥■Й╤▄ Л═∙КЁ╢Л·┘К▀┬К▀╓. Л²╢ Л╩╗К╡└М└╟Л≈░Л└°К┼■ К╛╢Л▀°К░╘К▀┬К▀╓.</param>
+        /// <returns>КЁ─М≥≤К░° Bitmap Л²╢К╞╦Л╖─ Й╟²Л╡╢Л·┘К▀┬К▀╓.</returns>
         public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
             if (value == null)
@@ -30,13 +32,13 @@ namespace MVVMToolKit.Converters
         }
 
         /// <summary>
-        /// ╨╞х╞ю╩ ╣г╣╧╦Ё╢о╢ы. юл да╧Жем©║╪╜╢б аЖ©Ь╣гаЖ ╬йю╦╧г╥н гв╩С nullю╩ ╧щх╞гу╢о╢ы.
+        /// КЁ─М≥≤Л²└ К░≤К▐▄К╕╫К▀┬К▀╓. Л²╢ Л╩╗К╡└М└╟Л≈░Л└°К┼■ Л╖─Л⌡░К░≤Л╖─ Л∙┼Л°╪К╞─К║° М∙╜Л┐│ nullЛ²└ К╟≤М≥≤М∙╘К▀┬К▀╓.
         /// </summary>
-        /// <param name="value">╨╞х╞ю╩ ╣г╣╧╦╠ ╟╙ют╢о╢ы.</param>
-        /// <param name="targetType">╢К╩С е╦ютют╢о╢ы. юл да╧Жем©║╪╜╢б ╧╚╫ц╣к╢о╢ы.</param>
-        /// <param name="parameter">╨╞х╞©║ ╩Г©Кгр цъ╟║ ╦е╟Ё╨╞╪Жют╢о╢ы. юл да╧Жем©║╪╜╢б ╧╚╫ц╣к╢о╢ы.</param>
-        /// <param name="culture">╧╝х╜╠г а╓╨╦ют╢о╢ы. юл да╧Жем©║╪╜╢б ╧╚╫ц╣к╢о╢ы.</param>
-        /// <returns>гв╩С nullют╢о╢ы.</returns>
+        /// <param name="value">КЁ─М≥≤Л²└ К░≤К▐▄К╕╢ Й╟▓Л·┘К▀┬К▀╓.</param>
+        /// <param name="targetType">К▄─Л┐│ М┐─Л·┘Л·┘К▀┬К▀╓. Л²╢ Л╩╗К╡└М└╟Л≈░Л└°К┼■ К╛╢Л▀°К░╘К▀┬К▀╓.</param>
+        /// <param name="parameter">КЁ─М≥≤Л≈░ Л┌╛Л ╘М∙═ Л╤■Й╟─ К╖╓Й╟°КЁ─Л┬≤Л·┘К▀┬К▀╓. Л²╢ Л╩╗К╡└М└╟Л≈░Л└°К┼■ К╛╢Л▀°К░╘К▀┬К▀╓.</param>
+        /// <param name="culture">К╛╦М≥■Й╤▄ Л═∙КЁ╢Л·┘К▀┬К▀╓. Л²╢ Л╩╗К╡└М└╟Л≈░Л└°К┼■ К╛╢Л▀°К░╘К▀┬К▀╓.</param>
+        /// <returns>М∙╜Л┐│ nullЛ·┘К▀┬К▀╓.</returns>
         public override object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
             return null;

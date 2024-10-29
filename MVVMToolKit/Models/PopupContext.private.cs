@@ -3,10 +3,11 @@ using MVVMToolKit.Templates;
 
 namespace MVVMToolKit.Models
 {
+    /// <inheritdoc />
     public partial class PopupContext
     {
         private PopupWindow? Owner => GetOwner() as PopupWindow;
-        private class WindowLocation
+        private sealed class WindowLocation
         {
             public double Left { get; }
             public double Top { get; }

@@ -1,4 +1,7 @@
-﻿using System.Windows.Input;
+﻿
+using System;
+using System.Windows;
+using System.Windows.Input;
 using Microsoft.Xaml.Behaviors;
 
 namespace MVVMToolKit.Command
@@ -124,7 +127,6 @@ namespace MVVMToolKit.Command
         /// <summary>
         /// <see cref="PassEventArgsToCommand"/>를 사용할 때 EventArgs를 변환하는 데 사용되는 변환기에 대한 매개변수를 가져오거나 설정합니다.
         /// PassEventArgsToCommand가 false인 경우, 이 속성은 사용되지 않습니다. 이것은 종속성 속성입니다.
-
         /// </summary>
         public object EventArgsConverterParameter
         {
@@ -163,11 +165,17 @@ namespace MVVMToolKit.Command
             EnableDisableElement();
         }
 
+        /// <summary>
+        /// 이벤트를 활성화합니다.
+        /// </summary>
         public void Invoke()
         {
             Invoke(null);
         }
-
+        /// <summary>
+        /// 이벤트를 활성화 합니다.
+        /// </summary>
+        /// <param name="parameter">이벤트에 전달할 파라미터</param>
         protected override void Invoke(object? parameter)
         {
             if (AssociatedElementIsDisabled() && !AlwaysInvokeCommand)
@@ -209,7 +217,6 @@ namespace MVVMToolKit.Command
             {
                 command.CanExecuteChanged += element.OnCommandCanExecuteChanged;
             }
-
             element.EnableDisableElement();
         }
         private bool AssociatedElementIsDisabled()

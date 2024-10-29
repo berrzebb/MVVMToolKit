@@ -66,6 +66,9 @@ namespace MVVMToolKit.Threading
             }
         }
 
+        /// <summary>
+        /// 작업이 실행중인지 여부.
+        /// </summary>
         public bool IsRunning => Volatile.Read(ref _activeOperation) != null;
 
         /// <summary>
@@ -75,7 +78,7 @@ namespace MVVMToolKit.Threading
         {
             _allowConcurrency = allowConcurrency;
         }
-
+        /// <inheritdoc/>
         public async Task<TResult> RunAsync<TResult>(
             Func<CancellationToken, Task<TResult>>? action,
             CancellationToken token = default)
@@ -99,7 +102,7 @@ namespace MVVMToolKit.Threading
 
                 cancellationTokenSource.Token.ThrowIfCancellationRequested();
                 Task<TResult> task = action(cancellationTokenSource.Token);
-                return await task.ConfigureAwait(false);
+                return await task;
             }
             finally
             {
@@ -107,6 +110,7 @@ namespace MVVMToolKit.Threading
             }
         }
 
+        /// <inheritdoc/>
         public Task RunAsync(Func<CancellationToken, Task> action,
             CancellationToken token = default)
         {
@@ -114,13 +118,14 @@ namespace MVVMToolKit.Threading
             ArgumentNullException.ThrowIfNull(action);
 #endif
 
-            return RunAsync<object?>(async ct =>
+            return RunAsync<object?>(ct =>
             {
-                await action(ct).ConfigureAwait(false);
+                action(ct);
                 return null;
             }, token);
         }
 
+        /// <inheritdoc/>
         public Task CancelAsync()
         {
             Operation? operation = Volatile.Read(ref _activeOperation);
@@ -131,8 +136,14 @@ namespace MVVMToolKit.Threading
             return operation.Completion;
         }
 
-        public bool Cancel() => !(CancelAsync().IsCompleted);
+        /// <inheritdoc/>
+        public bool Cancel() => !CancelAsync().IsCompleted;
 
-        public ICancelableTask Create(bool allowConcurrency = false) => new CancelableTask(allowConcurrency);
+        /// <summary>
+        /// 취소가능한 작업을 생성합니다.
+        /// </summary>
+        /// <param name="allowConcurrency"></param>
+        /// <returns></returns>
+        public static ICancelableTask Create(bool allowConcurrency = false) => new CancelableTask(allowConcurrency);
     }
 }

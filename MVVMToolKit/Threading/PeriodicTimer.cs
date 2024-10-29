@@ -1,16 +1,25 @@
-﻿using System.Diagnostics;
+﻿
+
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Sources;
 
 namespace MVVMToolKit.Threading
 {
-
+    /// <summary>
+    /// Periodic Timer
+    /// </summary>
     public class PeriodicTimer : IDisposable
     {
         private const uint MaxSupportedTimeout = 4294967294;
         private readonly Timer _timer;
         private readonly State _state;
+        /// <summary>
+        /// Periodic Timer 생성자
+        /// </summary>
+        /// <param name="period">주기</param>
+        /// <exception cref="ArgumentOutOfRangeException">범위가 벗어났을때 발생</exception>
         public PeriodicTimer(TimeSpan period)
         {
             long ms = (long)period.TotalMilliseconds;
@@ -23,23 +32,24 @@ namespace MVVMToolKit.Threading
             _timer = new Timer(s => ((State)s!).Signal(false), _state, (uint)ms, (uint)ms);
 
         }
-
+        /// <summary>
+        /// 다음 주기를 기다립니다.
+        /// </summary>
+        /// <param name="cancellationToken">취소 가능한 토큰.</param>
+        /// <returns>다음 주기 작업이 가능한지 여부.</returns>
         public ValueTask<bool> WaitForNextTickAsync(CancellationToken cancellationToken) =>
-            _state.WaitForNextTickAsync(this, cancellationToken);
+            _state.WaitForNextTickAsync(cancellationToken);
+        /// <summary>
+        /// 객체를 해제합니다.
+        /// </summary>
 
-        public void Dispose()
-        {
-            GC.SuppressFinalize(this);
-            _timer.Dispose();
-            _state.Signal(stopping: true);
-        }
-
+        /// <summary>
+        /// PeriodicTimer 소멸자
+        /// </summary>
         ~PeriodicTimer() => Dispose();
         private sealed class State : IValueTaskSource<bool>
         {
-            public PeriodicTimer? Owner;
-
-            private ManualResetValueTaskSourceCore<bool> _manualResetValueTaskSourceCore;
+            private ManualResetValueTaskSourceCore<bool> _manualResetValueTaskSourceCore = new();
 
             private CancellationTokenRegistration _ctr;
 
@@ -47,10 +57,10 @@ namespace MVVMToolKit.Threading
             private bool _signaled;
             private bool _activeWait;
 
-            private static readonly object SyncRoot = new();
-            public ValueTask<bool> WaitForNextTickAsync(PeriodicTimer owner, CancellationToken cancellationToken)
+            private static readonly object syncRoot = new();
+            public ValueTask<bool> WaitForNextTickAsync(CancellationToken cancellationToken)
             {
-                lock (SyncRoot)
+                lock (syncRoot)
                 {
                     if (_activeWait)
                     {
@@ -73,7 +83,6 @@ namespace MVVMToolKit.Threading
                     }
                     Debug.Assert(!_stopped, "Unexpectedly stopped without _signaled being true.");
 
-                    Owner = owner;
                     _activeWait = true;
                     _ctr = cancellationToken.Register(v =>
                     {
@@ -93,7 +102,7 @@ namespace MVVMToolKit.Threading
             {
                 bool completeTask = false;
 
-                lock (SyncRoot)
+                lock (syncRoot)
                 {
                     _stopped |= stopping;
 
@@ -121,7 +130,7 @@ namespace MVVMToolKit.Threading
             bool IValueTaskSource<bool>.GetResult(short token)
             {
                 _ctr.Dispose();
-                lock (SyncRoot)
+                lock (syncRoot)
                 {
                     try
                     {
@@ -132,7 +141,6 @@ namespace MVVMToolKit.Threading
                         _manualResetValueTaskSourceCore.Reset();
                         _ctr = default;
                         _activeWait = false;
-                        Owner = null;
                         if (!_stopped)
                         {
                             _signaled = false;
@@ -147,6 +155,25 @@ namespace MVVMToolKit.Threading
 
             void IValueTaskSource<bool>.OnCompleted(Action<object?> continuation, object? state, short token, ValueTaskSourceOnCompletedFlags flags) =>
                 _manualResetValueTaskSourceCore.OnCompleted(continuation, state, token, flags);
+        }
+        /// <summary>
+        /// 객체 해제
+        /// </summary>
+        /// <param name="disposing">해제 여부</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _timer.Dispose();
+                _state.Signal(stopping: true);
+            }
+        }
+
+        /// <inheritdoc />
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
     }
 }

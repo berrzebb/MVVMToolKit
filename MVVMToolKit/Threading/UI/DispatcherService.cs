@@ -1,4 +1,6 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
+using System.Windows.Threading;
 using MVVMToolKit.Interfaces;
 
 namespace MVVMToolKit.Threading.UI

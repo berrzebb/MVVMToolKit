@@ -1,4 +1,4 @@
-namespace MVVMToolKit.Hosting.Internal
+﻿namespace MVVMToolKit.Hosting.Internal
 {
     /// <summary>
     /// The disposable list class

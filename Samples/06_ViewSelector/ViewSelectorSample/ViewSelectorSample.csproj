@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows7.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <Platforms>AnyCPU;x64</Platforms>
+    <UserSecretsId>5b998e6d-6975-4b0c-9c6d-3a650c59caca</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\MVVMToolKit\MVVMToolKit.csproj" />
+    <ProjectReference Include="..\DataModule\DataModule.csproj" />
+    <ProjectReference Include="..\PresenterModule\PresenterModule.csproj" />
+  </ItemGroup>
+
+</Project>

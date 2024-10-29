@@ -1,0 +1,53 @@
+﻿<UserControl
+    x:Class="PresenterModule.Views.ControllerView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:PresenterModule.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Width="200"
+    Height="150"
+    mc:Ignorable="d">
+    <Grid Background="White">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0" Orientation="Horizontal">
+            <Label
+                Width="60"
+                HorizontalContentAlignment="Center"
+                VerticalContentAlignment="Center"
+                Content="추가" />
+            <TextBox Width="90" Text="{Binding AddInput}" />
+            <Button
+                Width="50"
+                Command="{Binding AddCommand}"
+                Content="추가" />
+        </StackPanel>
+        <StackPanel Grid.Row="1" Orientation="Horizontal">
+            <Label
+                Width="60"
+                HorizontalContentAlignment="Center"
+                VerticalContentAlignment="Center"
+                Content="삭제" />
+            <TextBox Width="90" Text="{Binding RemoveInput}" />
+            <Button
+                Width="50"
+                Command="{Binding RemoveCommand}"
+                Content="삭제" />
+        </StackPanel>
+        <StackPanel Grid.Row="2" Orientation="Horizontal">
+            <Label
+                Width="60"
+                HorizontalContentAlignment="Center"
+                VerticalContentAlignment="Center"
+                Content="결과" />
+            <TextBlock
+                Width="140"
+                VerticalAlignment="Center"
+                Text="{Binding TaskLog}" />
+        </StackPanel>
+    </Grid>
+</UserControl>

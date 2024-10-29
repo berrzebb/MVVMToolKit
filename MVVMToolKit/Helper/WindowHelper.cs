@@ -1,4 +1,4 @@
-using System.Windows.Interop;
+﻿using System.Windows.Interop;
 using MVVMToolKit.Helper.Native;
 using MVVMToolKit.Helper.ScreenHelper;
 

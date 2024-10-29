@@ -1,10 +1,12 @@
-﻿namespace MVVMToolKit.Navigation.Mapping;
-public interface IMappingConfiguration
+﻿namespace MVVMToolKit.Navigation.Mapping
 {
-    string RouteName { get; }
-    Type? ContextType { get; }
-    string? ViewType { get; }
-    ViewCacheMode CacheMode { get; }
+    public interface IMappingConfiguration
+    {
+        string RouteName { get; }
+        Type? ContextType { get; }
+        string? ViewName { get; }
+        ViewCacheMode CacheMode { get; }
 
-    ViewMode ViewMode { get; }
+        ViewMode ViewMode { get; }
+    }
 }

@@ -1,3 +1,4 @@
+﻿using System.Collections.Generic;
 using MVVMToolKit.Hosting.Core;
 
 namespace MVVMToolKit.Hosting.Internal

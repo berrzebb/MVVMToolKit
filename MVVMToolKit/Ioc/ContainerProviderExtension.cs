@@ -1,52 +1,53 @@
+﻿
+
 using System.Windows.Markup;
 
 namespace MVVMToolKit.Ioc
 {
     /// <summary>
-    /// The container provider extension class
+    /// Container Provider를 Markup에서 사용할 수 있는 확장입니다.
     /// </summary>
     /// <seealso cref="MarkupExtension"/>
     public class ContainerProviderExtension : MarkupExtension
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ContainerProviderExtension"/> class.
+        ///<see cref="ContainerProviderExtension"/> 생성자
         /// </summary>
         public ContainerProviderExtension()
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ContainerProviderExtension"/> class.
+        /// <see cref="ContainerProviderExtension"/> 생성자
         /// </summary>
-        /// <param name="type">The type to Resolve</param>
-        /// <param name="serviceKey">Service Key(Optional)</param>
+        /// <param name="type">해결할 타입</param>
+        /// <param name="serviceKey">타입을 찾아오기 위한 키(Optional)</param>
         public ContainerProviderExtension(Type? type, object? serviceKey)
         {
             Type = type;
             ServiceKey = serviceKey;
         }
         /// <summary>
-        /// Initializes a new instance of the <see cref="ContainerProviderExtension"/> class.
+        ///  <see cref="ContainerProviderExtension"/> 생성자
         /// </summary>
-        /// <param name="type">The type to Resolve</param>
-        /// <param name="serviceKey">Service Key(Optional)</param>
-        public ContainerProviderExtension(Type? type) : this(type, default)
+        /// <param name="type">해결할 타입</param>
+        public ContainerProviderExtension(Type? type) : this(type, null)
         {
         }
         /// <summary>
-        /// The type to Resolve
+        /// 해결할 타입
         /// </summary>
         public Type? Type { get; }
         /// <summary>
-        /// The type to Resolve
+        /// 타입을 찾기 위한 키
         /// </summary>
         public object? ServiceKey { get; }
 
         /// <summary>
-        /// Provide resolved object from <see cref="ContainerLocator"/>
+        ///  <see cref="ContainerProvider"/>를 통해 객체를 찾아옵니다.
         /// </summary>
-        /// <param name="serviceProvider"></param>
-        /// <returns></returns>
+        /// <param name="serviceProvider">DI 컨테이너</param>
+        /// <returns>찾은 객체</returns>
         public override object? ProvideValue(IServiceProvider serviceProvider)
         {
             return ContainerProvider.Resolve(Type, ServiceKey);

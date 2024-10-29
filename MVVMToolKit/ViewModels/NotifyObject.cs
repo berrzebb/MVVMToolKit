@@ -1,7 +1,9 @@
-﻿using System.Runtime.CompilerServices;
-
-namespace MVVMToolKit.ViewModels
+﻿
+namespace MVVMToolKit
 {
+    using System;
+    using System.Runtime.CompilerServices;
+
     /// <summary>
     /// The Notify Object Class.
     /// </summary>
@@ -41,10 +43,10 @@ namespace MVVMToolKit.ViewModels
             get => _value;
             set
             {
-                if (!EqualityComparer<T>.Default.Equals(this._value, value))
+                if (!EqualityComparer<T>.Default.Equals(_value, value))
                 {
                     OnPropertyChanging();
-                    this._value = value;
+                    _value = value;
                     OnPropertyChanged();
                 }
             }

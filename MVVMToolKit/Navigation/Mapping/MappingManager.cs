@@ -1,11 +1,10 @@
 ﻿using System.Collections.Concurrent;
+using System.Windows;
+using MVVMToolKit.Navigation.Mapping.Internals;
+using MVVMToolKit.Templates;
 
 namespace MVVMToolKit.Navigation.Mapping
 {
-    using System.Collections.Generic;
-    using Internals;
-    using Templates;
-
     internal class MappingManager : IMappingRegistry, IMappingBuilder, IRouteRegistry
     {
 
@@ -22,11 +21,10 @@ namespace MVVMToolKit.Navigation.Mapping
             return this;
         }
 
-        private static DataTemplate? CreateFromConfiguration(IMappingConfiguration configuration)
+        internal static DataTemplate? CreateFromConfiguration(IMappingConfiguration configuration)
         {
             FrameworkElementFactory viewProxyFactory = new(typeof(ViewProxy));
-            viewProxyFactory.SetValue(ViewProxy.ViewTypeProperty, configuration.ViewType);
-            viewProxyFactory.SetValue(ViewProxy.ViewModeProperty, configuration.ViewMode);
+            viewProxyFactory.SetValue(ViewProxy.ViewNameProperty, configuration.ViewName);
             viewProxyFactory.SetValue(ViewProxy.ViewCacheModeProperty, configuration.CacheMode);
             DataTemplate? dataTemplate = null;
             if (configuration.ContextType == null)
